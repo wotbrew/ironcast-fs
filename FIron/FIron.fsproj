@@ -82,14 +82,14 @@
     <Compile Include="Data.fs" />
     <Compile Include="Rand.fs" />
     <Compile Include="Builder.fs" />
+    <Compile Include="Js.Core.fs" />
     <Compile Include="State.Xna.fs" />
+    <Compile Include="State.Awe.fs" />
     <Compile Include="State.Db.fs" />
     <Compile Include="State.Time.fs" />
     <Compile Include="State.Cam.fs" />
     <Compile Include="State.Settings.fs" />
-    <Compile Include="Js.Core.fs" />
     <Compile Include="Js.Api.fs" />
-    <Compile Include="Gs.fs" />
     <Compile Include="Input.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />

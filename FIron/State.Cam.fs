@@ -27,6 +27,13 @@ type Camera = {
 
 
 
+type MapSize = int * int
+type ScreenSize = int * int
+type Msg = | Shift of Direction list
+           | Move of vec
+           | GetState of AsyncReplyChannel<Camera>
+           | Resize of ScreenSize * MapSize * int
+
 /// move the camera by to world position given by v (clamped)
 let move v cam = let (min, max) = cam.offsets
                  let pos = vec.Clamp(v, min, max)
@@ -50,14 +57,8 @@ let offsetForMapSize (vw, vh) (mw, mh) cs =
         let v2 = vec(float32 (mw * cs), float32 (mh * cs))
         v1 - v2, vec.Zero
 
-type MapSize = int * int
-type ScreenSize = int * int
-type Command = | Shift of Direction list
-               | Move of vec
-               | GetState of AsyncReplyChannel<Camera>
-               | Resize of ScreenSize * MapSize * int
-
 let agent = 
+
     stateAgent {
             size = 0, 0
             offsets = vec.Zero, vec.Zero
@@ -72,4 +73,6 @@ let agent =
             
 
 
+module Get =
+    let matrix() = agent.PostAndReply(GetState) |> matrix
     

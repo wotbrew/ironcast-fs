@@ -19,7 +19,24 @@ let dispatchQueue =
         }
         loop [])
 
-let dispatch (f:(unit -> unit)) = dispatchQueue.Post(Put f)
+let dispatch f = 
+    dispatchQueue.Post(Put f)
+
+let dispatchRAsync f = 
+    let r = ref None
+    dispatchQueue.Post(Put (fun () -> r := Some (f())))
+    let rec await() = async {
+        do! Async.Sleep(1)
+        match !r with
+         | Some x -> return x
+         | None -> return! await()
+    }
+    await()
+let dispatchR f = 
+    (dispatchRAsync f |> Async.StartAsTask).Result
+
+module Game = 
+  let mutable game:Game = null
 
 module Gfx = 
   let mutable manager:GraphicsDeviceManager = null 
@@ -75,3 +92,8 @@ module Gfx =
     let renderItem sb f = 
         match f with 
         | Spr (s, r, c) -> rsprite sb s r c
+
+
+let currentResolution() = 
+    let m = Gfx.device Gfx.manager
+    m.Viewport.Width, m.Viewport.Height                    

@@ -18,6 +18,7 @@ let agent =
         Xna.Gfx.changeResolution(w,h)
         Xna.Gfx.fullscreen settings.fullscreen
         Xna.Gfx.applyAll()
+        Awe.resize (w,h)
         settings
     
     simpleLazyStateAgent 

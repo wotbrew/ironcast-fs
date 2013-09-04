@@ -10,22 +10,31 @@ open Awesomium.Core
 open Util
 let nil<'a> = Unchecked.defaultof<'a>
 
+module Pages = 
+    let urify s = (IO.currentDirectory + s).ToUri()
+    let main = urify @"/Gui/main.html"
+    let newGame = urify @"/Gui/newgame.html"
+
 let tileDir = (IO.combinePaths IO.currentDirectory "Tiles")
 let cacheDir = (IO.combinePaths IO.currentDirectory "Gui\\img\\sprites\\")
 
 type MyGame() as x = 
     inherit Game()
+
+    do State.Xna.Game.game <- x
+
     let gdm = new GraphicsDeviceManager(x)
     let desktop = new SampleDesktop()
+    let settings = State.Settings.get()
 
-    let w, h = 1024, 768
+    let w, h = settings.resolution
 
     do desktop.Name <- "desktop"
        gdm.PreferredBackBufferWidth <- w
        gdm.PreferredBackBufferHeight <- h
+       gdm.IsFullScreen <- settings.fullscreen
     
     let sb = lazy(new SpriteBatch(x.GraphicsDevice))
-    let awe = lazy(new AwesomiumXNA.AwesomiumComponent(x, rect(0, 0, w, h)))
     let dungeon = ref None
     let time = ref State.Time.defaultTime
     let sampler = new SamplerState()
@@ -48,14 +57,10 @@ type MyGame() as x =
         dungeon := Some (Builder.genDungeon [Builder.defRoomSpec] (Rand.rand())    
                          |> Array2D.map (fun x -> if x then ss.["castleWall1"] else ss.["castleFloor1"] ))
         State.Cam.agent.Post(State.Cam.Resize ((x.Window.ClientBounds.Width, x.Window.ClientBounds.Height), Builder.defRoomSpec.gridSize, 32))           
-        
-        awe.Value.WebView.ParentWindow <- x.Window.Handle;
-        awe.Value.WebView.ConsoleMessage.Add(fun c -> printf "%s" c.Message)
-        Js.Api.Awe.init awe.Value.WebView |> ignore
-        awe.Value.WebView.Source <- Gs.Pages.main
-        //Gs.HtmlMut.current <- Gs.Pages.main
-        x.Components.Add(awe.Value)
-        
+
+        State.Awe.setGlobal "iron" Js.Api.iron
+        State.Awe.setSource Pages.main
+
 
         base.Initialize()
     override x.Draw(gt) = do
@@ -65,7 +70,7 @@ type MyGame() as x =
         x.GraphicsDevice.Clear(Color.Black)
 
         let sb = sb.Value
-        let matrix = State.Cam.agent.PostAndReply(State.Cam.GetState) |> State.Cam.matrix
+        let matrix = State.Cam.Get.matrix()
         do sb.Begin(SpriteSortMode.Deferred, 
                     BlendState.AlphaBlend,
                     SamplerState.LinearClamp,
@@ -78,11 +83,15 @@ type MyGame() as x =
         do sb.End()
         
         let gd = gdm.GraphicsDevice
-
         sb.Begin()
-        if not <| (awe.Value.WebViewTexture = null) then
-          sb.Draw(awe.Value.WebViewTexture, gd.Viewport.Bounds, Color.White);
-          for f in postGui.Result do State.Xna.Gfx.Foreground.renderItem sb f 
+
+        let aweTex = State.Awe.tex()
+        match State.Awe.tex() with
+         | Some t -> sb.Draw(t, gd.Viewport.Bounds, Color.White)
+         | None -> ()
+         
+        for f in postGui.Result do State.Xna.Gfx.Foreground.renderItem sb f 
+
         sb.End()
 
         base.Draw(gt)
@@ -94,8 +103,6 @@ type MyGame() as x =
         let gd = gdm.GraphicsDevice
         Input.fireinput (gd.Viewport.Width, gd.Viewport.Height)
 
-        //let awe = awe.Value
-        //Gs.Html.refreshCurrent awe.WebView
 
         let dispatch = State.Xna.dispatchQueue.PostAndReply(fun r -> State.Xna.Get r)
         for d in dispatch do d()

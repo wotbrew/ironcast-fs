@@ -3,7 +3,7 @@ open FSharpx
 
 
 let inline nullable x = Nullable.create x
-
+let inline delay f x = fun () -> f x
 module Int = 
     let parse = Option.tryParseWith System.Int32.TryParse
 module Float = 

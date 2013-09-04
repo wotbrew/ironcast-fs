@@ -34,11 +34,3 @@ module Drawing =
 let iron = 
      Options.all @
      Drawing.all
-
-module Awe = 
-    open Awesomium.Core
-    let init (awe:WebView) = 
-      do awe.LoadHTML("<html><head><title>Loading...</title></head><body></body></html>") |> ignore
-      while not awe.IsDocumentReady do WebCore.Update()
-      let o : JSObject = JSValue.op_Implicit(awe.CreateGlobalJavascriptObject("iron"))
-      mutObj iron o
