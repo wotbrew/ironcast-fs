@@ -19,6 +19,7 @@ let agent =
         Xna.Gfx.fullscreen settings.fullscreen
         Xna.Gfx.applyAll()
         Awe.resize (w,h)
+        Async.Start(async {do Option.protect (fun () -> Data.User.saveSettings settings) () |> ignore})
         settings
     
     simpleLazyStateAgent 

@@ -49,9 +49,7 @@ type MyGame() as x =
     override x.Initialize() = do
         let gd = gdm.GraphicsDevice
         State.Xna.Gfx.manager <- gdm
-        let db = Data.loadDb gd |> Option.orFail "Could not load db"
-        
-        let ss = db.sprites
+        let ss = State.Db.get().sprites
         Res.ImgCache.saveToCache cacheDir ss
 
         dungeon := Some (Builder.genDungeon [Builder.defRoomSpec] (Rand.rand())    

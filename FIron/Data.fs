@@ -4,7 +4,6 @@ open Util
 open FSharp.Data
 open FSharpx
 
-
 module Dir = 
     let path = IO.currentDirectory + "\\Data\\"
     let rpath = IO.currentDirectory
@@ -18,6 +17,29 @@ module File =
     let datafile f = IO.combinePaths path (f + ".json")
     let allRes = datafile "resolutions"
     let settings = datafile "settings"
+
+module Write = 
+    type JsonVal = | String of string
+                   | Num of float
+                   | Bool of bool
+                   | Array of JsonVal list
+                   | Obj of (string * JsonVal) list
+                   | Null
+    let quote a = "\"" + a + "\""
+    let rec writei indent v = 
+         match v with
+            | String s -> quote s
+            | Num f -> string f
+            | Bool b -> b.ToString().ToLower()
+            | Array e -> "[" + String.concat (",\n " + indent) (Seq.map (writei indent) e) + "]"
+            | Obj o -> "{\n" + indent + String.concat (",\n" + indent)
+                              (Seq.map (fun (a, b) -> indent + quote a + ": " + writei (indent + " ") b) o)  + "\n" + indent + "}"
+            | Null -> "null"
+    let write v = writei "" v
+    
+
+
+
 
 let loadf f file = IO.tryReadFile file
                    |> Option.bind f
@@ -59,9 +81,23 @@ module User =
             fullscreen = x.Fullscreen
         }
     }
+
     /// load a settings.json from a file
     let loadSettings = loadf parseSettings
-
+    
+    let writeResolution (w, h) = Write.String (string w + "x" + string h)
+    let writeSettings 
+        {
+            resolution = res
+            fullscreen = fs
+        } =
+        Write.Obj ["resolution", writeResolution res
+                   "fullscreen", Write.Bool fs]
+    
+    let saveSettings =
+         writeSettings
+         >> Write.write
+         >> IO.writeStringToFile false File.settings
 
 module Cre = 
     type Race = {
