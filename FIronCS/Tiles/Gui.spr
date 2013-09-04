@@ -1,0 +1,18 @@
+Tiles\Gui
+block 0 0 32 32
+slot 32 0 32 32
+gameButton 64 0 32 32
+charButton 96 0 32 32
+inventoryButton 128 0 32 32
+spellbookButton 160 0 32 32
+optionsButton 192 0 32 32
+restButton 224 0 32 32
+mapButton 256 0 32 32
+scrollup 0 32 32 32
+scrolldown 32 32 32 32
+endTurn 64 32 32 32
+beginCombat 96 32 32 32
+endCombat 128 32 32 32
+useButton 160 32 32 32
+abilityButton 192 32 32 32
+logButton 224 32 32 32

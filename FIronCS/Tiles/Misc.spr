@@ -1,0 +1,15 @@
+Tiles\Misc
+selection 0 0 32 32
+ministar 32 0 32 32
+piety 96 0 16 16
+spellPoints 110 0 16 16
+stamina 96 16 16 16
+stealth 110 16 16 16
+health 96 32 16 16
+blank 0 32 32 32
+supplies 32 32 32 32
+gold 64 32 32 32
+greenflag 0 64 32 32
+yellowflag 32 64 32 32
+redflag 64 64 32 32
+c7632161-aac0-4b6d-8002-2880ab57bdc8 64 0 32 32

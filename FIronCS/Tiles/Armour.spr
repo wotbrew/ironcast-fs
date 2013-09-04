@@ -1,0 +1,9 @@
+Tiles\Armour
+leatherIcon 0 0 32 32
+leatherEquip 32 0 32 32
+studdedLeatherIcon 0 32 32 32
+studdedLeatherEquip 32 32 32 32
+chainIcon 0 64 32 32
+chainEquip 32 64 32 32
+splintIcon 0 96 32 32
+splintEquip 32 96 32 32

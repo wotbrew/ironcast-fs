@@ -1,0 +1,8 @@
+Tiles\CastleDungeon
+castleFloor1 0 0 32 32
+castleWall1 0 32 32 32
+castleWall2 32 32 32 32
+castleWall3 64 32 32 32
+castleWall4 96 32 32 32
+castleWall5 128 32 32 32
+castleWall6 160 32 32 32

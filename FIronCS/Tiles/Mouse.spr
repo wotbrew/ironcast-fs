@@ -1,0 +1,10 @@
+Tiles\Mouse
+point 0 0 32 32
+select 32 0 32 32
+attack 64 0 32 32
+attackGreyed 0 32 32 32
+magic 32 32 32 32
+leftClick 64 32 32 32
+rightClick 0 64 32 32
+missileAttack 32 64 32 32
+missileAttackGreyed 64 64 32 32

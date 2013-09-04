@@ -1,0 +1,112 @@
+﻿@font-face {
+  font-family: 'IM Fell Great Primer SC';
+  font-style: normal;
+  font-weight : 400;
+  src: local('IM FELL Great Primer SC'), local('IM_FELL_Great_Primer_SC'), url(font.woff) format('woff');
+}
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Cinzel-Regular'), url(cinzel.woff) format('woff');
+}
+.ui-dialog-title
+{
+    font-family: 'IM Fell Great Primer SC', serif;
+    font-size: 20px;
+}
+.ui-widget
+{
+    font-family: 'Cinzel', serif;
+}
+body
+{
+    background-color: transparent;
+    font-size: 11px;
+    color: whitesmoke;
+}
+
+.iron-dialog
+{
+    padding: 10px 10px 10px 10px;
+    display: none;
+}
+
+.ui-dialog .ui-dialog-content
+{
+    overflow:hidden;
+}
+
+
+.fill
+{
+    width: 99%;
+}
+
+.feedback
+{
+    font-size: 1.4em;
+}
+
+.selectable .ui-selecting
+{
+    background: #FECA40;
+}
+
+.selectable .ui-selected
+{
+    background: #F39814;
+    color: white;
+}
+
+.selectable
+{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 60%;
+}
+
+    .selectable li
+    {
+        margin: 3px;
+        padding: 0.4em;
+        font-size: 1.4em;
+        height: 18px;
+    }
+
+.bordered td:hover
+{
+    border-color: #75cc35;
+}
+
+.bordered
+{
+    border: 1px solid #A5842E;
+}
+
+.active
+{
+    background-color: #75cc35;
+}
+.active-border
+{
+    border: 2px solid #75cc35;
+}
+
+
+.disable-select
+{
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.enable-select
+{
+    -webkit-user-select: auto;
+    -moz-user-select: all;
+    -ms-user-select: element;
+    user-select: all;
+}

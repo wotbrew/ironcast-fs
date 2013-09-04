@@ -1,0 +1,26 @@
+Tiles\Skill
+unarmed 0 0 32 32
+dagger 32 0 32 32
+sword 64 0 32 32
+axe 96 0 32 32
+throwing 128 0 32 32
+mace 160 0 32 32
+staff 192 0 32 32
+polearm 224 0 32 32
+bow 0 32 32 32
+sling 32 32 32 32
+sorcery 64 32 32 32
+theology 96 32 32 32
+lore 128 32 32 32
+healing 160 32 32 32
+persistance 192 32 32 32
+resilience 224 32 32 32
+athletics 0 64 32 32
+perception 32 64 32 32
+acrobatics 64 64 32 32
+skblock 96 64 32 32
+sneak 128 64 32 32
+pyromancy 160 64 32 32
+necromancy 194 64 32 32
+psionics 224 64 32 32
+mechanisms 0 96 32 32

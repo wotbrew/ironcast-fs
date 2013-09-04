@@ -1,0 +1,6 @@
+Tiles\Goblins
+goblinSlave 0 0 32 32
+goblinSlaveDead 32 0 32 32
+goblinWarrior 0 32 32 32
+goblinDead 32 32 32 32
+goblinArcher 0 64 32 32

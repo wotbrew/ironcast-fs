@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <link href="css/iron-theme/jquery-ui-1.10.3.custom.css" rel="stylesheet" />
+    <link href="css/iron.css" rel="stylesheet" />
+    
+    <script src="js/jquery-1.9.1.js"></script>
+    <script src="js/jquery-ui-1.10.3.custom.js"></script>
+    <script src="js/underscore.js"></script>
+    <script src="js/handlebars-1.0.0.js"></script>
+    <style type="text/css">
+        /*::-webkit-scrollbar
+        {
+            width: 12px;
+        }
+        /* this targets the default scrollbar (compulsory) */
+        ::-webkit-scrollbar-track
+        {
+            background-color: #b46868;
+        }
+        /* the new scrollbar will have a flat appearance with the set background color */
+        ::-webkit-scrollbar-thumb
+        {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        /* this will style the thumb, ignoring the track */
+        ::-webkit-scrollbar-button
+        {
+            width: 26px;
+            height: 26px;
+            background-color: transparent;
+        }
+
+            ::-webkit-scrollbar-button:decrement:vertical
+            {
+                background-image: url("img/scroll-up.png");
+            }
+
+            ::-webkit-scrollbar-button:increment:vertical
+            {
+                background-image: url("img/scroll-down.png");
+            }
+        /* optionally, you can style the top and the bottom buttons (left and right for horizontal bars) */
+        ::-webkit-scrollbar-corner
+        {
+            background-color: black;
+        }
+        /* if both the vertical and the horizontal bars appear, then perhaps the right bottom corner also needs to be styled */
+
+        .no-close .ui-dialog-titlebar-close
+        {
+            display: none;
+        }
+    </style>
+    <title></title>
+</head>
+
+<body class="disable-select">
+    <!-- main menu -->
+    <div id="menu" title="Ironcast" class="iron-dialog">
+        <div id="newgame" class="iron-button fill" title="Start a new adventure!">
+            New Game
+        </div>
+        <br />
+        <div id="options" class="iron-button fill" title="Fiddle with the knobs!">
+            Options
+        </div>
+        <br />
+        <div id="exit" class="iron-button fill" title="Had enought of an ass kickin' have ye?!">
+            Exit
+        </div>
+    </div>
+    <!-- options -->
+    <div id="menu-options" title="Ironcast - Options" class="iron-dialog">
+    </div>
+</body>
+<script id="optiontemplate" type="text/x-handlebars-template">
+    <p>Resolution</p>
+    <div style="overflow: auto; height: 100px; width: 200px; padding: 10px 10px 10px 10px;">
+    <div id="resolutions" class="fill">
+        {{#each resolutions}}
+        <input type="radio" class="fill" name="res" id="res{{@index}}"
+               {{#if this.active }} checked="checked" {{/if}} />
+        <label for="res{{@index}}" class="res fill">{{res.[0]}}x{{res.[1]}}</label>
+    {{/each}}
+    </div>
+    </div>
+    <div>
+        <label for="option-fullscreen">
+            Fullscreen
+        </label>
+        <input type="checkbox" id="option-fullscreen" 
+            {{#if isFullscreen}}checked="checked"{{/if}}/>
+    </div>
+</script>
+ <script type="text/javascript" src="js/irondebug.js"></script>
+ <script type="text/javascript" src="js/iron.js"></script>
+<script type="text/javascript">
+    $(function () {
+        var settings = iron.getSettings();
+
+        var options = {
+            resolutions: _.map(iron.getResolutions(), function (r, i) {
+                return {
+                    res: r,
+                    active: _.isEqual(r, settings.resolution) ? true : false
+                };
+            }),
+            isFullscreen: false
+        };
+
+
+        var resolutionButtonTemplate = Handlebars.compile($("#optiontemplate").html());
+        $("#menu-options").html(resolutionButtonTemplate(options));
+
+        $("#option-fullscreen").change(function () {
+            var val = $(this).is(":checked") ? "true" : "false";
+            //iron.setFullscreen(val);
+        });
+
+        $(window).resize(function () {
+            $("#menu-options").dialog("close");
+            $("#menu-options").dialog("open");
+        });
+
+
+        $("#resolutions").buttonset();
+
+        $(".iron-dialog").dialog({
+            draggable: false,
+            resizable: false,
+            autoOpen: false,
+            hide: false,
+            show: false,
+            closeOnEscape: false,
+            dialogClass: "no-close"
+        })
+
+        var apply = {
+            text: "Apply",
+            click: function () {
+                var res = $(".res.ui-state-active span").html();
+                var fullscreen = $("#option-fullscreen").is(":checked") ? true : false
+                iron.setSettings({
+                    resolution: res,
+                    fullscreen: fullscreen
+                });
+            }
+        }
+
+        $("#menu-options").dialog("option", "buttons",
+            [ apply,
+             { text: "Cancel", click: function () { $(this).dialog("close"); $("#menu").dialog("open"); } }]);
+
+        $(".iron-button").button();
+
+        $("#newgame").click(function () {
+            $("#menu").dialog("close");
+            window.location = "newgame.html";
+            //iron.newGame();
+        });
+        $("#options").click(function () {
+            $("#menu").dialog("close");
+            $("#menu-options").dialog("open");
+        });
+        $("#exit").click(function () {
+            $("#menu").dialog("close");
+            //iron.exit();
+        });
+
+        $(document).tooltip(
+            {
+                hide: false,
+                show: false,
+            });
+
+
+        $("#menu").dialog("open");
+
+        try {
+            iron.clear();
+        }
+        catch (e) { }
+    })
+</script>
+</html>

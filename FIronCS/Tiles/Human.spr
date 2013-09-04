@@ -1,0 +1,8 @@
+Tiles\Human
+humanMale 32 0 32 32
+humanFemale 0 0 32 32
+human_hm1 64 0 32 32
+human_b1 96 0 32 32
+human_hf1 0 32 32 32
+human_hf2 64 32 32 32
+human_h1 32 32 32 32

@@ -1,0 +1,156 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <link href="css/iron-theme/jquery-ui-1.10.3.custom.css" rel="stylesheet" />
+    <link href="css/iron.css" rel="stylesheet" />
+    <script src="js/jquery-1.9.1.js"></script>
+    <script src="js/jquery-ui-1.10.3.custom.js"></script>
+    <script src="js/underscore.js"></script>
+    <style type="text/css">
+        /*::-webkit-scrollbar
+        {
+            width: 12px;
+        }
+        /* this targets the default scrollbar (compulsory) */
+        ::-webkit-scrollbar-track
+        {
+            background-color: #b46868;
+        }
+        /* the new scrollbar will have a flat appearance with the set background color */
+        ::-webkit-scrollbar-thumb
+        {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        /* this will style the thumb, ignoring the track */
+        ::-webkit-scrollbar-button
+        {
+            width: 26px;
+            height: 26px;
+            background-color: transparent;
+        }
+
+            ::-webkit-scrollbar-button:decrement:vertical
+            {
+                background-image: url("img/scroll-up.png");
+            }
+
+            ::-webkit-scrollbar-button:increment:vertical
+            {
+                background-image: url("img/scroll-down.png");
+            }
+        /* optionally, you can style the top and the bottom buttons (left and right for horizontal bars) */
+        ::-webkit-scrollbar-corner
+        {
+            background-color: black;
+        }
+        /* if both the vertical and the horizontal bars appear, then perhaps the right bottom corner also needs to be styled */
+
+        .no-close .ui-dialog-titlebar-close
+        {
+            display: none;
+        }
+
+        .char-table td
+        {
+            width: 128px;
+            height: 160px;
+            border: 1px solid #A5842E;
+        }
+
+        .char
+        {
+            width:64px;
+            height:64px;
+            border: 1px solid #A5842E;
+        }
+
+        .char-table td:hover
+        {
+            border-color: #75cc35;
+        }
+    </style>
+    <title></title>
+</head>
+
+<body class="disable-select">
+    <!-- main menu -->
+    <div id="newgame" title="New Game" class="iron-dialog no-close">
+        <table class="char-table">
+            <tr>
+                <td>
+                    <p>Char 1</p>
+                    <div class="char">
+                    </div>
+                </td>
+                <td>
+                    <p>Char 2</p>
+                    <div class="char">
+                    </div>
+                </td>
+                <td>
+                    <p>Char 3</p>
+                    <div class="char">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>Char 4</p>
+                    <div class="char">
+                    </div>
+                </td>
+                <td>
+                    <p>Char 5</p>
+                    <div class="char">
+                    </div>
+                </td>
+                <td>
+                    <p>Char 6</p>
+                    <div class="char">
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+    
+<script type="text/javascript" src="js/irondebug.js"></script>
+<script type="text/javascript">
+    $(function () {
+        try {
+            iron.clear();
+        }
+        catch (e) { }
+        $(".iron-dialog").dialog({
+            draggable: false,
+            resizable: false,
+            autoOpen: false,
+            hide: false,
+            show: false,
+            dialogClass: "no-close"
+        });
+
+        $("#newgame").dialog("option", "buttons",
+            [{ text: "Done", click: function () { alert("no implemented!"); } },
+             { text: "Back", click: function () { window.location = "main.html";} }]);
+
+        $("#newgame").dialog("open");
+        $(".char-table td").click(function () {
+            window.location = "newchar.html";
+        });
+
+
+        var positions = _.map($(".char"), function (e) { return $(e).offset(); })
+        try {
+            _.each(positions, function (e) {
+                var x = parseInt(e.left);
+                var y = parseInt(e.top);
+                return iron.drawChar("" + x + " " + y + " 64 64");
+            });
+        } catch (ex) { }
+
+    })
+</script>
+</html>

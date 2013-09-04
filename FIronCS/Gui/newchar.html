@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <link href="css/iron-theme/jquery-ui-1.10.3.custom.css" rel="stylesheet" />
+    <link href="css/iron.css" rel="stylesheet" />
+    <script src="js/jquery-1.9.1.js"></script>
+    <script src="js/jquery-ui-1.10.3.custom.js"></script>
+    <script src="js/underscore.js"></script>
+    <script src="js/handlebars-1.0.0.js"></script>
+    <style type="text/css">
+        /*::-webkit-scrollbar
+        {
+            width: 12px;
+        }
+        /* this targets the default scrollbar (compulsory) */
+        ::-webkit-scrollbar-track
+        {
+            background-color: #b46868;
+        }
+        /* the new scrollbar will have a flat appearance with the set background color */
+        ::-webkit-scrollbar-thumb
+        {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        /* this will style the thumb, ignoring the track */
+        ::-webkit-scrollbar-button
+        {
+            width: 26px;
+            height: 26px;
+            background-color: transparent;
+        }
+
+            ::-webkit-scrollbar-button:decrement:vertical
+            {
+                background-image: url("img/scroll-up.png");
+            }
+
+            ::-webkit-scrollbar-button:increment:vertical
+            {
+                background-image: url("img/scroll-down.png");
+            }
+        /* optionally, you can style the top and the bottom buttons (left and right for horizontal bars) */
+        ::-webkit-scrollbar-corner
+        {
+            background-color: black;
+        }
+        /* if both the vertical and the horizontal bars appear, then perhaps the right bottom corner also needs to be styled */
+
+        .no-close .ui-dialog-titlebar-close
+        {
+            display: none;
+        }
+
+        .char-table td
+        {
+            width: 128px;
+            height: 160px;
+            border: 1px solid #A5842E;
+        }
+
+        .char
+        {
+            width: 64px;
+            height: 64px;
+            border: 1px solid #A5842E;
+        }
+    </style>
+    <title></title>
+</head>
+
+<script id="character" type="text/x-handlebars">
+    <div title="Name your character">
+        <label for="name">Name</label>
+        <input type="text" value="{{name}}" />
+    </div>
+    <table>
+        <tr>
+            <td rowspan="2">{{> races}}
+            </td>
+            <td>{{> stats}}
+            </td>
+        </tr>
+    </table>
+</script>
+
+<script id="races" type="text/x-handlebars">
+    <div style="width: 56px; height: 470px; overflow: auto; padding-right: 3px">
+        <label for="racechoice">Race</label>
+        <div id="racechoice">
+            {{#each races}}
+            <div title="{{name}}">
+                <input type="radio" name="race" id="race{{ @index }}" />
+                <label for="race{{@index}}">
+                    <img src="img/sprites/{{sprite}}.png" />
+                </label>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</script>
+<script id="stats" type="text/x-handlebars">
+    <ul style="list-style: none">
+        {{#each stats}}
+            <li>
+                <img style="float: left;" src="img/sprites/{{sprite}}.png"  title="{{name}}"/>
+                <input style="float: left; height: 24px; width: 20px;" class="iron-spinner" readonly="true" value="{{value}}" />
+                <div style="clear: both;" />
+            </li>
+        {{/each}}
+    </ul>
+</script>
+
+<body class="disable-select">
+    <!-- main menu -->
+    <div id="newchar" title="{Character NAME}" class="iron-dialog no-close">
+    </div>
+</body>
+<script type="text/javascript" src="js/irondebug.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        var testChar = {
+            name: "testy jim",
+            races: [
+                { sprite: "humanMale", name: "Human" },
+                { sprite: "dwarfMale", name: "Dwarf" }
+            ],
+            stats: _.chain([
+                { name: "Strength", value: 10 },
+                { name: "Dexterity", value: 10 },
+                { name: "Constitution", value: 10 },
+                { name: "Intelligence", value: 10 },
+                { name: "Power", value: 10 },
+                { name: "Size", value: 10 }
+            ])
+            .map(function (o) {
+                o.sprite = o.name.toLowerCase();
+                return o;
+            })
+            .value()
+        }
+
+        Handlebars.registerPartial("races", $("#races").html());
+        Handlebars.registerPartial("stats", $("#stats").html());
+        var characterTemplate = Handlebars.compile($("#character").html());
+
+        $("#newchar").html(characterTemplate(testChar));
+        $(".iron-spinner").spinner();
+
+        $(".iron-dialog").dialog({
+            draggable: false,
+            resizable: false,
+            autoOpen: false,
+            hide: false,
+            show: false,
+            closeOnEscape: false,
+            width: 800,
+            height: 600,
+            dialogClass: "no-close"
+        });
+
+        $(".iron-button").button();
+        $("#racechoice").buttonset();
+        $("#newchar").dialog("open");
+        $("#newchar").dialog("option", "buttons",
+            [{ text: "Done", click: function () { window.location = "newgame.html"; } },
+             { text: "Reset", click: function () { alert("not implemented!"); } },
+             { text: "Cancel", click: function () { window.location = "newgame.html"; } }]);
+
+        $(document).tooltip(
+            {
+                hide: false,
+                show: false,
+            });
+        try {
+            iron.clear();
+        }
+        catch (e) { }
+    })
+</script>
+</html>

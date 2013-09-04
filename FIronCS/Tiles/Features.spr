@@ -1,0 +1,14 @@
+Tiles\Features
+stoneStairDown 0 0 32 32
+stoneStairUp 32 0 32 32
+pit 64 0 32 32
+doorClosed 128 0 32 32
+doorOpen 96 0 32 32
+water1 0 32 32 32
+water2 32 32 32 32
+water3 64 32 32 32
+water4 96 32 32 32
+water5 128 32 32 32
+water6 160 32 32 32
+water7 192 32 32 32
+water8 224 32 32 32

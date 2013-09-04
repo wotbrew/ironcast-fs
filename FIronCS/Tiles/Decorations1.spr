@@ -1,0 +1,10 @@
+Tiles\Decorations1
+torch1 0 0 32 32
+torch2 32 0 32 32
+torch3 64 0 32 32
+torch4 96 0 32 32
+skeletonDecor 0 32 32 32
+wallFlag 32 32 32 32
+torchBracket 64 32 32 32
+switchLeft 96 32 32 32
+switchRight 96 64 32 32

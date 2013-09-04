@@ -1,0 +1,23 @@
+bin
+obj
+packages
+[Rr]elease*/
+_ReSharper*/
+WE-settings.xml
+*.ReSharper
+*.ReSharper.user
+*.suo
+*.user
+*.fs.bak
+*.userprefs
+*.fs.bak
+*.nupkg
+*.*~
+*.psess
+*.vsp
+:
+nugetpackage/lib
+build
+
+# Generated documentation
+Docs/output/*
