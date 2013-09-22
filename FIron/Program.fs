@@ -53,7 +53,6 @@ type MyGame() as x =
         let db = State.Db.get()
         let ss = db.sprites
         Res.ImgCache.saveToCache cacheDir ss
-
         State.Cam.agent.Post(State.Cam.Resize ((x.Window.ClientBounds.Width, x.Window.ClientBounds.Height), Builder.defRoomSpec.gridSize, 32))           
         
         State.Awe.setGlobal "iron" Js.Api.iron
@@ -63,13 +62,36 @@ type MyGame() as x =
 
         let visible = map.walk |> Grid.cells |> Seq.filter (fun (pt, v) -> v) |> List.ofSeq |> flip Rand.List.randn seed |> fst
 
-        MapStack.placeCre ({id = 0; body = db.races.["Human"].spriteM |> snd |> List.singleton } : Cre.Creature) visible map
-        |> State.Map.init
+        MapStack.placeCre ({id = 0; isPlayer = true; body = db.races.["Human"].spriteM |> snd |> List.singleton } : Cre.Creature) visible map
+        |> State.MapState.init
 
+        let map = State.MapState.get()
+
+        let printMap map =
+            let vec = Grid.vector map
+            let w,h = map.size
+            for y = 0 to h - 1 do
+                printf "\n"
+                for x = 0 to w - 1 do
+                 let c = if Grid.get x y map then '_' else '#'
+                 printf "%c" c
+
+        printfn "walk"
+        printMap map.stack.walk
+        printfn "\nexpl"
+        printMap map.stack.expl
+
+        let newWalk = map.stack.walk |> Grid.mapi (fun x y v -> v && Grid.get x y map.stack.expl)
+        
+        printfn "\nnewwalk"
+        printMap newWalk
+
+        State.Path.newWalk newWalk
+        State.MapState.refreshVis()
         State.Cam.agent.Post(State.Cam.Centre (Vec.ofPt visible * 32.0f))
         base.Initialize()
     override x.Draw(gt) = do
-        let stack = State.Map.getAsync() |> Async.StartAsTask
+        let stack = State.MapState.getAsync() |> Async.StartAsTask
         let cam = State.Cam.getAsync() |> Async.StartAsTask
         let postGui = State.Xna.Gfx.Foreground.getForegroundAsync() |> Async.StartAsTask
 
@@ -110,6 +132,8 @@ type MyGame() as x =
     override x.Update(gt) = 
         
         time := State.Time.updateTime gt !time
+        let delta = time.Value.delta    
+        let update = State.Event.pushAsync delta |> Async.StartAsTask
         x.Window.Title <- sprintf "FPS: %f" time.Value.fps
         let gd = gdm.GraphicsDevice
         Input.fireinput (gd.Viewport.Width, gd.Viewport.Height)
@@ -117,6 +141,8 @@ type MyGame() as x =
 
         let dispatch = State.Xna.dispatchQueue.PostAndReply(fun r -> State.Xna.Get r)
         for d in dispatch do d()
+
+        update.Wait()
         base.Update(gt)
 
 

@@ -17,8 +17,8 @@ type Stack = {
     walk: Grid<bool>
     decor: Grid<sprite option> 
     expl: Grid<bool>
-    vis: Grid<bool>
     cre: Grid<Cre.Creature option>
+    vis: Grid<bool>
 }
 
 let empty = {
@@ -31,6 +31,7 @@ let empty = {
     vis = Grid.empty
 }
 
+let creCells stack = Grid.someCells stack.cre
 
 let generate seed theme = 
     let dungeon = Builder.genDungeon [Builder.defRoomSpec] seed
@@ -61,7 +62,14 @@ let mapCre f stack = {
     
 let clearCre p = mapCre (Grid.update1 p None)
 let placeCre cre p = mapCre (Grid.update1 p (Some cre))
-let moveCre cre a b = clearCre a >> placeCre cre b
+let moveCre cre a b stack = 
+    if get1 b stack.walk && get1 b stack.cre |> Option.isNone then 
+        clearCre a stack |> placeCre cre b |> Some
+    else 
+    #if DEBUG
+    do printfn "Could not move creature %i to %i,%i" cre.id b.X b.Y 
+    #endif
+    None
 
 
 let draw sb vp cs stack =
@@ -83,11 +91,16 @@ let draw sb vp cs stack =
 
 
 let clearVisibility stack = withVis (Grid.create stack.terr.size false) stack
-let updateVisibility cre pt stack = 
-     let range = Cre.sightRange cre
+let updateVisibility prs stack = 
      let lm = stack.light
-     let pts = FIronCS.Geom.RaysWhileSkip(pt, (fun p -> Grid.inBounds1 p lm && (Grid.get1 p lm |> not)), range, 1, 0.3f)
-     mapVis (Grid.updateAll (pts |> Seq.map (Tup.pairWith true))) stack
+     let pts = 
+        [for cre, pt in prs do
+             let range = Cre.sightRange cre
+             yield async {
+                return FIronCS.Geom.RaysWhileSkip(pt, (fun p -> Grid.inBounds1 p lm && (Grid.get1 p lm |> not)), range, 1, 0.3f)
+             }]
+        |> Async.Parallel |> Async.map Seq.concat |> Async.StartAsTask
+     mapVis (Grid.updateAll (pts.Result |> Seq.map (Tup.pairWith true))) stack
         
 
         

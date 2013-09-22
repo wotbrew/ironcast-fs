@@ -43,7 +43,7 @@ module Event =
                 async {
                     let! cam = Cam.getAsync()
                     let pos = Cam.world (loc s) cam / 32.0f |> Pt.ofVec
-                    State.Map.moveParty pos
+                    State.Move.movePlayer 0 pos
                 } |> Async.Start
               | _ -> ())
 

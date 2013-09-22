@@ -66,7 +66,18 @@ let ofCells def cells =
     let sz = Seq.map fst cells |> Pt.max |> Pt.add2 1 |> Pt.toPair
     ofCells1 def sz cells
 
-let map f v = mapVector (Vector.map f) v
+let map f g = mapVector (Vector.map f) g
+let mapi f g = 
+    let w, h = g.size
+    let vector =
+        seq {
+            for y = 0 to h - 1 do
+                for x = 0 to w - 1 do
+                    yield f x y (get x y g)
+        } |> Vector.ofSeq
+    mapVector (konst vector) g
+
+    
 
 let inline sizeRect g = 
     let w, h = g.size
@@ -79,7 +90,10 @@ let ofArray2D arr =
         size = sz
     }
 
-    
+let toArray2D grd = 
+    let w,h = grd.size
+    Array2D.init w h (fun x y -> get x y grd)
+  
 let floors g = 
     cells g
     |> Seq.filter (snd >> not)
@@ -117,6 +131,10 @@ module Terr =
             if b then List.randn t.wall rand
             else List.randn t.floor rand)
 
+let inline shadeForVisbility visible = 
+    if visible then Color.White
+    else Color.Gray
+
 let viewPortIter data f g =
     let vp = data.viewport
     let dm = data.expl
@@ -130,15 +148,15 @@ let viewPortIter data f g =
     let bottom = min (mh-1) (sy + h)
     for x = sx to right do
         for y = sy to bottom do
-            let c = if get x y data.vis then Color.White else Color.Gray
-            if get x y dm then f x y c g
+            let isVisible = get x y data.vis 
+            if get x y dm then f x y isVisible g
 
 /// draw quickly a grid of sprites
 let fastDraw sb data g =
     let cs = data.cellSize
     let inline f x y c g =
          let spr = get x y g
-         Res.Sprite.draw sb spr x y 32 c
+         Res.Sprite.draw sb spr x y 32 (shadeForVisbility c)
     viewPortIter data f g
 
 /// draw quickly a grid of sprite options
@@ -146,6 +164,6 @@ let fastDraw1 sb data g =
     let cs = data.cellSize
     let inline f x y c g =
        match get x y g with
-       | Some spr -> Res.Sprite.draw sb spr x y 32 c
+       | Some spr -> Res.Sprite.draw sb spr x y 32 (shadeForVisbility c) 
        | None -> ()
     viewPortIter data f g

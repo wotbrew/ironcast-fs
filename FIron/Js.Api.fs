@@ -25,7 +25,7 @@ module Drawing =
         Option.maybe {
             let! i = oi
             let! p = op
-            return State.Map.moveCre i p
+            return State.MapState.moveCre i p
         } |> ignore)  
  let drawChar = jsproc1
                  fsrect 
