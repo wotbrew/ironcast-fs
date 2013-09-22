@@ -1,5 +1,5 @@
 ﻿module Res
-
+open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 
 open Geom
@@ -10,6 +10,12 @@ open Util
 type tex = Texture2D
 type sprite = tex * rect
 type sheet = string * (string * rect list)
+
+module Sprite = 
+ let inline draw (sb:SpriteBatch) (t,r) x y cs color =
+    sb.Draw(t, rect(x*cs,y*cs,cs,cs), Nullable.create r, color)
+ let inline draw1 sb spr x y cs = draw sb spr x y cs Color.White   
+
 
 /// Concerning Textures
 module Tex = 

@@ -11,6 +11,7 @@ module Dir =
     let dir d = IO.combinePaths path d |> IO.directoryInfo
     let tileDir = rdir "Tiles"
     let raceDir = dir "races"
+    let themeDir = dir "themes"
 
 module File = 
     let path = Dir.path
@@ -33,7 +34,7 @@ module Write =
             | Bool b -> b.ToString().ToLower()
             | Array e -> "[" + String.concat (",\n " + indent) (Seq.map (writei indent) e) + "]"
             | Obj o -> "{\n" + indent + String.concat (",\n" + indent)
-                              (Seq.map (fun (a, b) -> indent + quote a + ": " + writei (indent + " ") b) o)  + "\n" + indent + "}"
+                              (Seq.map (fun (a, b) -> indent + "  " + quote a + ": " + writei (indent + "  ") b) o)  + "\n" + indent + "}"
             | Null -> "null"
     let write v = writei "" v
     
@@ -49,7 +50,7 @@ let loadAll f dir = Option.protect IO.filesInDir dir
                                     >> List.ofSeq
                                     >> Option.mapM f )
 
-module User =
+module Settings =
     type Resolution = int * int
     let parseResolution s = Option.maybe {
         let! r = String.split s 'x' |> Array.whenLength 2
@@ -127,19 +128,63 @@ module Cre =
     
 
 
+ module Dungeon = 
+    open Res
+    type Theme = {
+        name : string
+        floor : sprite list
+        wall : sprite list
+        wallDecor : sprite list
+    }
+
+    type ThemeJson = JsonProvider< @"..\FIronCS\Data\themes\castle.json" >
+    let parseTheme ss str = Option.maybe {
+        let! x = Option.protect ThemeJson.Parse str
+        let name = x.Name
+        let f, w, wd = Tup.map3 List.ofArray (x.Floor, x.Wall, x.WallDecor)
+        let! floor = Option.mapM (flip Map.tryFind ss) f
+        let! wall = Option.mapM (flip Map.tryFind ss) w
+        let! wallDecor = Option.mapM (flip Map.tryFind ss) wd
+        return {
+            name = name
+            floor = floor
+            wall = wall
+            wallDecor = wallDecor
+        }
+    }
+    let loadTheme ss = loadf (parseTheme ss)
+    let loadAllThemes ss = loadAll (loadTheme ss) Dir.themeDir  
+    let themeLookup themes = 
+        themes
+        |> Seq.map (fun r -> r.name, r)
+        |> Seq.distinctBy fst
+        |> Map.ofSeq
+    let loadThemeMap ss = loadAllThemes ss |> Option.map themeLookup
+
+
 type Db = {
-    allRes : User.Resolution list
+    allRes : Settings.Resolution list
     sprites : Map<string, Res.sprite>
     races : Map<string, Cre.Race>
+    themes : Map<string, Dungeon.Theme>
 }
 
+
+
 let loadDb gd = Option.maybe {
-    let! allRes = User.loadResolutions File.allRes
+    do printfn "%s" "Loading resolutions"
+    let! allRes = Settings.loadResolutions File.allRes
+    do printfn "%s" "Loading resources"
     let! sprites = Res.Sheet.spriteStore Dir.tileDir gd |> Choice.toOption
+    do printfn "%s" "Loading races"
     let! races = Cre.loadRacesMap sprites
+    do printfn "%s" "Loading themes"
+    let! themes = Dungeon.loadThemeMap sprites
     return {
         allRes = allRes
         sprites = sprites
         races = races
+        themes = themes
     }
 }
+

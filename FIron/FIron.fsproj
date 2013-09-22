@@ -67,9 +67,6 @@
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
     </Reference>
-    <Reference Include="Squid">
-      <HintPath>..\lib\Squid.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -81,7 +78,11 @@
     <Compile Include="Res.fs" />
     <Compile Include="Data.fs" />
     <Compile Include="Rand.fs" />
+    <Compile Include="Grid.fs" />
+    <Compile Include="Cre.fs" />
     <Compile Include="Builder.fs" />
+    <Compile Include="MapStack.fs" />
+    <Compile Include="MapTables.fs" />
     <Compile Include="Js.Core.fs" />
     <Compile Include="State.Xna.fs" />
     <Compile Include="State.Awe.fs" />
@@ -89,6 +90,8 @@
     <Compile Include="State.Time.fs" />
     <Compile Include="State.Cam.fs" />
     <Compile Include="State.Settings.fs" />
+    <Compile Include="State.Map.fs" />
+    <Compile Include="State.Event.fs" />
     <Compile Include="Js.Api.fs" />
     <Compile Include="Input.fs" />
     <Compile Include="Program.fs" />

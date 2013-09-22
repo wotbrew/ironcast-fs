@@ -1,24 +1,34 @@
 ﻿module Util
 open FSharpx
+open FSharpx.Collections
 
 
 let inline nullable x = Nullable.create x
 let inline delay f x = fun () -> f x
+
 module Int = 
     let parse = Option.tryParseWith System.Int32.TryParse
 module Float = 
     let parse = Option.tryParseWith System.Double.TryParse
 
 module Tup = 
-    let pairWith b a = (a, b)
+    let inline map fa fb (a,b) = fa a, fb b
+    let inline  dup a = a,a
+    let inline  flip (a,b) = (b,a)
+    let inline  pairWith b a = (a, b)
     let mapall4 f (a,b,c,d) = (f a, f b, f c, f d)
     let inline mapsnd f (a,b) = a, f b
     let inline mapfst f (a,b) = f a, b
+    let inline map3 f (a,b,c) = f a, f b, f c
     let ofList4 = 
         function
         | [a;b;c;d] -> Some (a,b,c,d)
         | _ -> None
-    
+module Tup3 =
+    let inline third (a,b,c) = c   
+    let inline pair (a,b,c) = a,b
+    let inline mapthird f (a,b,c) = a, b, f c
+    let inline map fa fb fc (a,b,c) = fa a, fb b, fc c
 module Seq = 
     let notEmpty s = not <| Seq.isEmpty s
     let whenAny xs = Option.ofBoolAndValue (notEmpty xs, xs)
@@ -35,6 +45,7 @@ module List =
             else None
                         
 module Option =
+    open FSharpx.Option
     let ofNil a = if a = null then None else Some a 
     let inline protect f x = 
         try
@@ -46,6 +57,12 @@ module Option =
         function 
         | None -> f()
         | x -> x
+    let tuple3 (a,b,c) = maybe {
+        let! sa = a
+        let! sb = b
+        let! sc = c
+        return sa, sb, sc
+    }
 module Choice =
     let mapMLazy f xs = 
         let rec loop acc ele = 
@@ -82,13 +99,31 @@ module Array =
                         r.[y] <- Array.init l1 (fun x -> a.[x, y])
                       r
 module Array2D = 
-    let flatten a = let l1 = Array2D.length1 a
-                    let l2 = Array2D.length2 a
-                    let r = Array.zeroCreate (l1 * l2)
+    let dim a = Array2D.length1 a, Array2D.length2 a
+    let cells a = let l1, l2 = dim a
+                  seq {
                     for x = 0 to l1 - 1 do
+                    for y = 0 to l2 - 1 do 
+                    yield x,y,a.[x,y]
+                  }
+    let flatten a = let l1, l2 = dim a
+                    seq {
+                        for x = 0 to l1 - 1 do
+                         for y = 0 to l2 - 1 do 
+                          yield a.[x,y]
+                    }
+    let flatten1 a = let l1, l2 = dim a
+                     let r = Array.zeroCreate (l1 * l2)
+                     for x = 0 to l1 - 1 do
                         for y = 0 to l2 - 1 do
                         r.[y * l2 + x] <- a.[x, y]
-                    r
+                     r
+    let inline inBounds x y a = 
+        x < Array2D.length1 a
+        && y < Array2D.length2 a
+        && x >= 0
+        && y >= 0
+    let inline fill v arr = arr |> Array2D.iteri (fun x y _ -> arr.[x,y] <- v)
 
 module IO = 
     let tryReadFile f = Option.protect IO.readFileAsString f
@@ -100,7 +135,7 @@ let stateAgent init f =
         let rec loop st = async {
             let! c = box.Receive()
             let nst = f st c
-            return! loop st
+            return! loop nst
         }
         loop state)
         
@@ -130,3 +165,8 @@ let simpleLazyStateAgent init set =
         match c with 
          | Get r -> r.Reply(st); st
          | Set a -> set a)
+
+module Vector = 
+   let ofArray2D arr = 
+       Array2D.flatten arr
+       |> Vector.ofSeq

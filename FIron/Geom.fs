@@ -46,9 +46,11 @@ module Dir =
     let diagp = Seq.map pt diag |> Array.ofSeq
 
 module Pt =
+    let inline x (p:pt) = p.X
+    let inline y (p:pt) = p.Y
     let inline map fx fy (a:pt) = pt(fx a.X, fy a.Y)
     let inline map2 f x y (a:pt) = pt(f a.X x, f a.Y y)
-    let inline ofVec (pt:pt) = vec(float32 pt.X, float32 pt.Y)
+    let inline ofVec (vec:vec) = pt(int vec.X, int vec.Y)
     let inline of2 x y = pt(x, y)
     let inline ofPair (x, y) = pt(x, y)
     let inline add1 x y a = map2 (+) x y a
@@ -57,7 +59,7 @@ module Pt =
     let inline sub1 x y a = map2 (-) x y a
     let inline sub a (b:pt) = sub1 b.X b.Y a
     let inline sub2 a n = sub1 n n a
-    let inline mult1 x y a = map2 (-) x y a
+    let inline mult1 x y a = map2 (*) x y a
     let inline mult a (b:pt) = mult1 b.X b.Y a
     let inline mult2 n a = mult1 n n a
     let inline multf x y (a:pt) = pt(float32 a.X * x |> int, float32 a.X * y |> int)
@@ -69,10 +71,21 @@ module Pt =
     let inline divf2 n a = divf n n a
     let inline adj a = Seq.map (add a) Dir.allp
     let inline adjc a = Seq.map (add a) Dir.cardinalp
+    let inline maxX pts = Seq.maxBy x pts |> x
+    let inline maxY pts = Seq.maxBy y pts |> y
+    let inline max (pts:pt seq) = pt(maxX pts, maxY pts)
+    let inline toPair p = x p, y p
+module Vec = 
+    let inline ofPt (p:pt) = vec(float32 p.X, float32 p.Y)
 module Rect =
     open FSharpx.Option
+    let inline x (r:rect) = r.X
+    let inline y (r:rect) = r.Y
+    let inline w (r:rect) = r.Width
+    let inline h (r:rect) = r.Height
     let inline move x y (r:rect) = rect(x, y, r.Width, r.Height)
     let inline move1 (pt:pt) r = move pt.X pt.Y r
+    let inline move2 (vec:vec) r = move (int vec.X) (int vec.Y) r
     let inline origin r = move 0 0 r
     let inline shift x y (r:rect) = rect(r.X + x, r.Y + y, r.Width, r.Height)
     let inline stretch w h (r:rect) = rect(r.X, r.Y, r.Width + w, r.Height + h)
@@ -82,6 +95,7 @@ module Rect =
     let inline contains1 a b = contains b a
     let inline ofPts (loc:pt) (wh:pt) = rect(loc.X, loc.Y, wh.X, wh.Y)
     let inline ofTup (x, y, w, h) = rect(x, y, w, h)
+    let inline toTup (r:rect) = r.X,r.Y,r.Width,r.Height
     let inline map f (r:rect) = seq {for x = r.X to r.Right - 1 do
                                        for y = r.Y to r.Bottom - 1 do
                                          yield f x y} 
@@ -105,6 +119,7 @@ module Rect =
                       >>= Option.mapM Int.parse
         return rect(split.[0], split.[1], split.[2], split.[3])
     }
+
+
+
    
-
-

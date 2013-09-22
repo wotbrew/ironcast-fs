@@ -5,7 +5,7 @@ open Rand
 open FSharpx
 
 type RoomSpec = {seed:rand; maxIter:int; count:int; width:int*int; height:int*int; gridSize:int*int}
-let defRoomSpec = {seed = rand(); maxIter = 10000; count = 10; width = (4, 14); height = (4, 14); gridSize = (64, 64)} 
+let defRoomSpec = {seed = rand(); maxIter = 10000; count = 38; width = (4, 14); height = (4, 14); gridSize = (64, 64)} 
 
 let maxGridSize rs = let gs = Seq.map (fun r -> r.gridSize) rs
                      (Seq.map fst gs |> Seq.max, Seq.map snd gs |> Seq.max)
@@ -53,4 +53,22 @@ let genDungeon rs seed =
                     Rect.edges gr |> Seq.iter(fun p -> grid.[p.X, p.Y] <- true)
                     grid
 
-let drawGrid g = Array2D.map (fun x -> if x then "#" else "_") g |> Array.ofArray2D |> Seq.map (String.concat "") |> String.concat "\n"                                    
+let drawGrid g = Array2D.map (fun x -> if x then "#" else "_") g 
+                 |> Array.ofArray2D |> Seq.map (String.concat "") |> String.concat "\n"                  
+                           
+
+module Decor =
+    let tilesMod = 12
+    /// take a bool map and pick random wall tiles to decorate.
+    let walls g decor rate r = 
+        let walls = Grid.walls g |> List.ofSeq
+        let take = List.length walls / rate
+        if take < 1 then
+            Grid.create g.size None
+        else
+        let randomized = List.randomize walls r |> Seq.take take
+        randomized
+        |> Seq.map (fun (pt,v) -> pt, Some <| List.randn decor r)
+        |> Grid.ofCells None
+    let walls1 a decor r = walls a decor tilesMod r
+

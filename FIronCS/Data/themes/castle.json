@@ -1,0 +1,19 @@
+{
+    "name":"castle", 
+	"floor": [
+       "castleFloor1" 
+    ], 
+    "wall": [
+       "castleWall1",
+       "castleWall2",
+       "castleWall3",
+       "castleWall4",
+       "castleWall5",
+       "castleWall6"
+    ],
+    "wallDecor": [
+        "skeletonDecor",
+        "wallFlag",
+        "torchBracket"
+    ]
+}

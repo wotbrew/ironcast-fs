@@ -73,9 +73,6 @@
     <Reference Include="mscorlib">
       <Private>False</Private>
     </Reference>
-    <Reference Include="Squid">
-      <HintPath>..\lib\Squid.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Private>False</Private>
     </Reference>
@@ -95,20 +92,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChatBox.cs" />
-    <Compile Include="Gridview\GridColumn.cs" />
-    <Compile Include="Gridview\GridView.cs" />
-    <Compile Include="Gridview\GridViewItem.cs" />
-    <Compile Include="InputManager.cs" />
+    <Compile Include="Geom.cs" />
     <Compile Include="IPathFinder.cs" />
-    <Compile Include="MessageBox.cs" />
     <Compile Include="PathFinder.cs" />
     <Compile Include="PathFinderFast.cs" />
     <Compile Include="PriorityQueueB.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RendererXna.cs" />
-    <Compile Include="SampleDesktop.cs" />
-    <Compile Include="SampleWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Gui\css\iron-theme\images\animated-overlay.gif">
@@ -261,6 +250,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Data\settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\themes\castle.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Gui\css\cinzel.woff">

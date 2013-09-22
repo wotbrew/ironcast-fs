@@ -5,7 +5,7 @@ open FSharpx
 open Util
 
 module Options =
- open User
+ open Settings
  let getSettings = jsfun0 (fun () -> Settings.get() |> jssettings)
  let setSettings = Option.silenceIn Settings.set |> jsproc1 fssettings
  let getResolutions = jsfun0 (fun () -> Db.get().allRes |> jsallRes)
@@ -19,6 +19,14 @@ module Drawing =
  open Xna
  open Gfx
  let clear = jsproc0 Foreground.clear
+ //int -> pt -> ()
+ let moveChar = 
+    jsproc2 fsint fspt (fun oi op ->
+        Option.maybe {
+            let! i = oi
+            let! p = op
+            return State.Map.moveCre i p
+        } |> ignore)  
  let drawChar = jsproc1
                  fsrect 
                  (fun ro -> 
@@ -29,7 +37,8 @@ module Drawing =
                     | _ -> ())
  let all = 
     ["clear", clear
-     "drawChar", drawChar]
+     "drawChar", drawChar
+     "moveChar", moveChar]
 
 let iron = 
      Options.all @

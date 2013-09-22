@@ -111,6 +111,7 @@ let fstupx4 f =
                     |> Option.bind Tup.ofList4
        | _ -> None
 
+let fspt a = fspair fsint fsint a |> Option.map Geom.Pt.ofPair
 let fsrect a = 
       fstupx4 fsint a 
       |> Option.map Geom.Rect.ofTup
@@ -196,8 +197,8 @@ and createObj pairs =
     let o = new JSObject()
     mutObj pairs o
 
-module User =
-    open Data.User
+module Settings =
+    open Data.Settings
     let jsresolution = jspair
     let jssettings s = 
         let res = jsresolution s.resolution

@@ -1,6 +1,6 @@
 ﻿module State.Settings 
 open Data
-open Data.User
+open Data.Settings
 open Util
 open FSharpx
 
@@ -19,7 +19,7 @@ let agent =
         Xna.Gfx.fullscreen settings.fullscreen
         Xna.Gfx.applyAll()
         Awe.resize (w,h)
-        Async.Start(async {do Option.protect (fun () -> Data.User.saveSettings settings) () |> ignore})
+        Async.Start(async {do Option.protect (fun () -> Data.Settings.saveSettings settings) () |> ignore})
         settings
     
     simpleLazyStateAgent 
