@@ -83,6 +83,8 @@
     <Compile Include="Builder.fs" />
     <Compile Include="MapStack.fs" />
     <Compile Include="MapTables.fs" />
+    <Compile Include="Cam.fs" />
+    <Compile Include="Ui.fs" />
     <Compile Include="Js.Core.fs" />
     <Compile Include="State.Xna.fs" />
     <Compile Include="State.Awe.fs" />
@@ -90,12 +92,14 @@
     <Compile Include="State.Time.fs" />
     <Compile Include="State.Cam.fs" />
     <Compile Include="State.Settings.fs" />
-    <Compile Include="State.MapState.fs" />
     <Compile Include="State.Path.fs" />
+    <Compile Include="State.MapState.fs" />
     <Compile Include="State.Move.fs" />
+    <Compile Include="State.Ui.fs" />
     <Compile Include="State.Event.fs" />
     <Compile Include="Js.Api.fs" />
     <Compile Include="Input.fs" />
+    <Compile Include="Render.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <None Include="packages.config" />

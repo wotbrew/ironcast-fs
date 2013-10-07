@@ -29,11 +29,25 @@ let create (w,h) v = {
     size = w,h
 }
 
+/// gets the value at x y
 let inline get x y g = Vector.nth (indmap x y g) g.vector
+/// gets the value at point pt
 let inline get1 (pt:pt) g = get pt.X pt.Y g
-let inline cell x y g = (pt(x,y), get x y g)
-let inline cell1 (pt:pt) g = (pt, get1 pt g)    
 
+/// gets the values in the given rect 
+let getIn rect g = 
+    Rect.pts rect
+    |> Seq.map (flip get1 g)
+
+/// gets the cell at x y
+let inline cell x y g = (pt(x,y), get x y g)
+/// gets the cell at point pt
+let inline cell1 (pt:pt) g = (pt, get1 pt g)    
+/// gets the cells in the given rect
+let cellsIn rect g = 
+    Rect.pts rect
+    |> Seq.map (Tup.dup >> Tup.mapsnd (flip cell1 g))
+/// gets all the cells in a grid
 let cells g = 
     let w,h = g.size
     seq {
@@ -67,6 +81,12 @@ let ofCells def cells =
     ofCells1 def sz cells
 
 let map f g = mapVector (Vector.map f) g
+let iteri f g = 
+    let w, h = g.size
+    for y = 0 to h - 1 do
+        for x = 0 to w - 1 do
+            do f x y (get x y g)
+        
 let mapi f g = 
     let w, h = g.size
     let vector =
@@ -112,18 +132,6 @@ let innerWalls g =
 
 let innerWallsAndFloors g = floors g |> Seq.append <| innerWalls g
 
-//data required to draw a grid
-type DrawData = {
-    viewport:rect
-    expl:Grid<bool>
-    vis:Grid<bool>
-    cellSize:int
-}
-
-
-
- 
-
 module Terr = 
     open Dungeon
     let create rand t g = 
@@ -135,35 +143,3 @@ let inline shadeForVisbility visible =
     if visible then Color.White
     else Color.Gray
 
-let viewPortIter data f g =
-    let vp = data.viewport
-    let dm = data.expl
-    let cs = data.cellSize  
-    let mw, mh = g.size
-    let sx = max 0 ((vp.X / cs) - 1);
-    let sy = max 0 ((vp.Y / cs) - 1);
-    let w = (vp.Width / cs) + 1;
-    let h = (vp.Height / cs) + 1;
-    let right = min (mw-1) (sx + w)
-    let bottom = min (mh-1) (sy + h)
-    for x = sx to right do
-        for y = sy to bottom do
-            let isVisible = get x y data.vis 
-            if get x y dm then f x y isVisible g
-
-/// draw quickly a grid of sprites
-let fastDraw sb data g =
-    let cs = data.cellSize
-    let inline f x y c g =
-         let spr = get x y g
-         Res.Sprite.draw sb spr x y 32 (shadeForVisbility c)
-    viewPortIter data f g
-
-/// draw quickly a grid of sprite options
-let fastDraw1 sb data g =
-    let cs = data.cellSize
-    let inline f x y c g =
-       match get x y g with
-       | Some spr -> Res.Sprite.draw sb spr x y 32 (shadeForVisbility c) 
-       | None -> ()
-    viewPortIter data f g

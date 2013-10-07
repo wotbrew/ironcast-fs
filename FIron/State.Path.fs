@@ -16,9 +16,16 @@ module Core =
     let pathfind (pather:FIronCS.PathFinderFast) a b = pather.FindPath(a,b)
     let findPath pather walk a b =
         if shouldFindPath walk a b then
-            pathfind pather b a //switch to avoid list reversal
-            |> Option.ofNil
-            |> Option.map (Seq.skip 1 >> Seq.map (fun nd -> pt(nd.X, nd.Y)) >> List.ofSeq)
+            let i = walk.[a.X, a.Y]
+            walk.[a.X, a.Y] <- true
+
+            let res = 
+                pathfind pather b a //switch to avoid list reversal
+                |> Option.ofNil
+                |> Option.map (Seq.skip 1 >> Seq.map (fun nd -> pt(nd.X, nd.Y)) >> List.ofSeq)
+
+            walk.[a.X, a.Y] <- i
+            res
         else None
 
         
@@ -26,6 +33,11 @@ module Core =
 let agent = Agent.Start(fun box ->
     let pather = ref null : FIronCS.PathFinderFast ref
     let walk = ref null : bool[,] ref
+    let mutWalk g = 
+        let w = !walk
+        Grid.iteri (fun x y v -> w.[x,y] <- v) g
+    let sameSize (g:Grid.Grid<'a>) arr = 
+        Array2D.dim arr = g.size
     let rec loop() = async {
         let! msg = box.Receive()
         match msg with
@@ -35,7 +47,11 @@ let agent = Agent.Start(fun box ->
             r.Reply(path)
             return! loop()
          | NewWalk g ->
-            walk := Grid.toArray2D g
+            let w = !walk
+            if w = null || not <| sameSize g w then
+                walk := Grid.toArray2D g
+            else 
+                mutWalk g
             pather := FIronCS.PathFinderFast(!walk)
             return! loop()
     }

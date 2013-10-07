@@ -9,6 +9,7 @@ type CreId = {
     id : int
     isPlayer : bool
 }
+let isPlayer cid = cid.isPlayer
 type PathState = {
     paths : Map<CreId, Path>
 }
@@ -25,7 +26,7 @@ let printPath path =
 
 type MapState = State.MapState.MapState
 module Core = 
-    let moveTo (ms:MapState) i (pt:pt) = 
+    let pathFind (ms:MapState) i (pt:pt) = 
         #if DEBUG_MOVE
         printfn "Attempting move creature %i -> %O" i pt
         #endif
@@ -57,23 +58,27 @@ module Box =
                     id = i
                     isPlayer = isPlayer
                 }
-                let path = Core.moveTo st i p
+                let path = Core.pathFind st i p
                 match path with 
                  | Some pth -> post (AddPath(creid,pth)) box
                  | _ -> ()
             } |> Async.Start
 
     let tickPaths st = 
-        let paths = Seq.filter (snd >> List.notEmpty) (st.paths |> Map.toSeq)
-        seq {
-            for i, pth in paths do
-                if i.isPlayer then
-                    State.MapState.moveCre i.id pth.Head
-                    State.MapState.refreshVis()
-                else
-                    State.MapState.moveCre i.id pth.Head
-                yield i, Seq.skip 1 pth |> List.ofSeq
-        } |> Map.ofSeq
+        let paths = Seq.filter (snd >> List.notEmpty) (st.paths |> Map.toSeq) |> List.ofSeq
+        let all = 
+            seq {
+                for i, pth in paths do
+                    yield async {
+                        let! didMove = State.MapState.moveCreAsync i.id pth.Head
+                        return i, didMove, if didMove then Seq.skip 1 pth |> List.ofSeq else pth |> List.ofSeq
+                    }
+            } 
+            |> Async.Parallel |> Async.StartAsTask
+        let anyPlayers = all.Result |> Seq.exists (fun (i, dm, pth) -> i.isPlayer && dm)
+        if anyPlayers then
+          do State.MapState.refreshVis()
+        all.Result |> Seq.map (fun (i, dm, pth) -> i,pth) |> Map.ofSeq
 
 let agent = Agent.Start(fun box ->
     let rec loop st = async {

@@ -34,6 +34,7 @@ module Core =
                 let! cre = Map.tryFind id state.tables.cre
                 let! stack = MapStack.moveCre cre pos p state.stack
                 let tables = MapTables.moveCre id p state.tables
+                State.Path.newWalk stack.walk
                 return cre, {
                     stack = stack
                     tables = tables
@@ -58,7 +59,7 @@ type Msg =
      | Get of AsyncReplyChannel<MapState>
      | Init of MapStack.Stack
      | Refresh of RefreshEvent
-     | MoveCre of int * pt
+     | MoveCre of int * pt * AsyncReplyChannel<bool>
 
 
 let agent = Agent.Start(fun box ->
@@ -70,9 +71,10 @@ let agent = Agent.Start(fun box ->
          | Init s -> return! loop (initState s)
          | Refresh r -> let ns = refresh r st
                         return! loop ns
-         | MoveCre (i, p) -> 
-            let ns = Core.moveCre i p st |> Option.map snd |> Option.getOrElse st
-            return! loop ns
+         | MoveCre (i, p, r) -> 
+            let nso = Core.moveCre i p st |> Option.map snd
+            r.Reply(Option.isSome nso)
+            return! loop (nso <??> st)
     }
     loop initial)
 
@@ -80,4 +82,5 @@ let getAsync() = agent.PostAndAsyncReply(Get)
 let get() = agent.PostAndReply(Get)
 let init st = agent.Post(Init st)
 let refreshVis() = agent.Post(Refresh Vis)
-let moveCre i p = agent.Post(MoveCre (i, p))
+let moveCreAsync i p = agent.PostAndAsyncReply(fun r -> MoveCre (i, p, r))
+let moveCre i p = agent.PostAndReply(fun r -> MoveCre (i, p, r))

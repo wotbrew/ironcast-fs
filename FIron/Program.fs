@@ -3,8 +3,8 @@
 // See the 'F# Tutorial' project for more help.
 open Microsoft.Xna.Framework;
 open Microsoft.Xna.Framework.Graphics
-open Builder
 open Geom
+open Builder
 open FSharpx
 open FSharpx.Collections
 open FIronCS
@@ -46,11 +46,14 @@ type MyGame() as x =
        x.Content.RootDirectory <- "Content"
     
     let seed = Rand.rand()
-
+    let db = lazy (State.Db.get())
+    let mutable drawData = None : Render.DrawData option
     override x.Initialize() = do
         let gd = gdm.GraphicsDevice
         State.Xna.Gfx.manager <- gdm
-        let db = State.Db.get()
+        State.Xna.Gfx.initBlank()
+
+        let db = db.Value
         let ss = db.sprites
         Res.ImgCache.saveToCache cacheDir ss
         State.Cam.agent.Post(State.Cam.Resize ((x.Window.ClientBounds.Width, x.Window.ClientBounds.Height), Builder.defRoomSpec.gridSize, 32))           
@@ -60,10 +63,12 @@ type MyGame() as x =
         let castle = db.themes.["castle"]
         let map = MapStack.generate seed castle
 
-        let visible = map.walk |> Grid.cells |> Seq.filter (fun (pt, v) -> v) |> List.ofSeq |> flip Rand.List.randn seed |> fst
-
-        MapStack.placeCre ({id = 0; isPlayer = true; body = db.races.["Human"].spriteM |> snd |> List.singleton } : Cre.Creature) visible map
+        let visible = map.walk |> Grid.cells |> Seq.filter (fun (pt, v) -> v) |> Seq.map fst |> List.ofSeq |> flip Rand.List.randomize seed
+        let vis6 = Seq.take 6 visible |> List.ofSeq
+        Seq.fold (fun map (pt, i) ->  MapStack.placeCre ({id = i; isPlayer = true; body = db.races.["Human"].spriteM |> snd |> List.singleton} : Cre.Creature) pt map) map (Seq.zip vis6 [0 .. 5])
         |> State.MapState.init
+        //MapStack.placeCre ({id = 0; isPlayer = true; body = db.races.["Human"].spriteM |> snd |> List.singleton } : Cre.Creature) visible map
+        //|> State.MapState.init
 
         let map = State.MapState.get()
 
@@ -88,44 +93,16 @@ type MyGame() as x =
 
         State.Path.newWalk newWalk
         State.MapState.refreshVis()
-        State.Cam.agent.Post(State.Cam.Centre (Vec.ofPt visible * 32.0f))
+        State.Cam.agent.Post(State.Cam.Centre (Vec.ofPt vis6.Head * 32.0f))
+
+        drawData <- Some { db = db; gd = x.GraphicsDevice; sb = sb.Value; sampler = sampler }
+
         base.Initialize()
+
     override x.Draw(gt) = do
-        let stack = State.MapState.getAsync() |> Async.StartAsTask
-        let cam = State.Cam.getAsync() |> Async.StartAsTask
-        let postGui = State.Xna.Gfx.Foreground.getForegroundAsync() |> Async.StartAsTask
-
-        x.GraphicsDevice.SamplerStates.[0] <- sampler
-        x.GraphicsDevice.Clear(Color.Black)
-        
-        let sb = sb.Value
-        let matrix = State.Cam.matrix cam.Result
-        let vp = State.Cam.viewport cam.Result
-
-        let map = stack.Result
-
-        do sb.Begin(SpriteSortMode.Deferred, 
-                    BlendState.AlphaBlend,
-                    SamplerState.PointClamp,
-                    DepthStencilState.None,
-                    RasterizerState.CullNone,
-                    null,
-                    matrix)
-        MapStack.draw sb vp 32 map.stack
-
-        do sb.End()
-        
-        let gd = gdm.GraphicsDevice
-        sb.Begin()
-
-        let aweTex = State.Awe.tex()
-        match State.Awe.tex() with
-         | Some t -> sb.Draw(t, gd.Viewport.Bounds, Color.White)
-         | None -> ()
-         
-        for f in postGui.Result do State.Xna.Gfx.Foreground.renderItem sb f 
-
-        sb.End()
+        match drawData with
+         | Some dd -> Render.draw dd
+         | _ -> ()
 
         base.Draw(gt)
 
@@ -148,7 +125,6 @@ type MyGame() as x =
 
 [<EntryPoint>]
 let main argv = 
-    let build = Builder.genRooms defRoomSpec
     MyGame().Run()
     1
     

@@ -11,34 +11,34 @@ type rect = Rectangle
 type Rectangle with
     member r.BottomRight = pt(r.X + r.Width, r.Y + r.Height)
 
-type Direction = | North
-                 | NorthEast
-                 | East
-                 | SouthEast
-                 | South
-                 | SouthWest
-                 | West
-                 | NorthWest
+type Direction = | N
+                 | NE
+                 | E
+                 | SE
+                 | S
+                 | SW
+                 | W
+                 | NW
 
 module Dir = 
     /// Transform a direction to a unit point
     let inline pt d =
         match d with
-            | North -> pt(0, -1)
-            | NorthEast -> pt(1, -1)
-            | East -> pt(1, 0)
-            | SouthEast -> pt(1, 1)
-            | South -> pt(0, 1)
-            | SouthWest -> pt(-1, 1)
-            | West -> pt(-1, 0)
-            | NorthWest -> pt(-1, -1)
+            | N -> pt(0, -1)
+            | NE -> pt(1, -1)
+            | E -> pt(1, 0)
+            | SE -> pt(1, 1)
+            | S -> pt(0, 1)
+            | SW -> pt(-1, 1)
+            | W -> pt(-1, 0)
+            | NW -> pt(-1, -1)
     /// Transform a direction to a unit vector
     let inline vec d = let p = pt d
                        in vec(float32 p.X, float32 p.Y)
     /// A set of all the directions
-    let all = [North; NorthEast; East; SouthEast; South; SouthWest; West; NorthWest] |> set
+    let all = [N; NE; E; SE; S; SW; W; NW] |> set
     /// A set if all cardinal directions
-    let cardinal = [North; East; South; West;] |> set
+    let cardinal = [N; E; S; W;] |> set
     let cardinalp = Seq.map pt all |> Array.ofSeq
     let allp = Seq.map pt all |> Array.ofSeq
     /// A set of all diagonal directions
@@ -46,6 +46,7 @@ module Dir =
     let diagp = Seq.map pt diag |> Array.ofSeq
 
 module Pt =
+    let def = Unchecked.defaultof<pt>
     let inline x (p:pt) = p.X
     let inline y (p:pt) = p.Y
     let inline map fx fy (a:pt) = pt(fx a.X, fy a.Y)
@@ -76,24 +77,38 @@ module Pt =
     let inline max (pts:pt seq) = pt(maxX pts, maxY pts)
     let inline toPair p = x p, y p
 module Vec = 
+    let def = Unchecked.defaultof<vec>
+    let inline x (v:vec) = v.X
+    let inline y (v:vec) = v.Y
     let inline ofPt (p:pt) = vec(float32 p.X, float32 p.Y)
+    let inline ofInts x y = vec(float32 x, float32 y)
+    let inline of2 x y = vec(x, y)
+    let inline toPair v = x v, y v
 module Rect =
     open FSharpx.Option
+    let def = Unchecked.defaultof<rect>
     let inline x (r:rect) = r.X
     let inline y (r:rect) = r.Y
     let inline w (r:rect) = r.Width
     let inline h (r:rect) = r.Height
+    let inline size r = w r, h r
+    let inline sizev r = Vec.ofInts (w r) (h r)
+    let inline loc (r:rect) = r.Location
+    let inline locv (r:rect) = r.Location |> Vec.ofPt
     let inline move x y (r:rect) = rect(x, y, r.Width, r.Height)
     let inline move1 (pt:pt) r = move pt.X pt.Y r
     let inline move2 (vec:vec) r = move (int vec.X) (int vec.Y) r
     let inline origin r = move 0 0 r
     let inline shift x y (r:rect) = rect(r.X + x, r.Y + y, r.Width, r.Height)
+    let inline shrink r n = rect(x r + n, y r + n, w r - n * 2, h r - n * 2)
+    let inline expand r n = shrink r (- n)
     let inline stretch w h (r:rect) = rect(r.X, r.Y, r.Width + w, r.Height + h)
     let inline intersects (a:rect) (b:rect) = a.Intersects b
-    let inline intersects1 a b = intersects b a
+    let inline intersectsr a b = intersects b a
     let inline contains (a:rect) (b:rect) = a.Contains(b)
-    let inline contains1 a b = contains b a
+    let inline containsr a b = contains b a
     let inline ofPts (loc:pt) (wh:pt) = rect(loc.X, loc.Y, wh.X, wh.Y)
+    let inline ofVecs (loc:vec) (wh:vec) = rect(int loc.X, int loc.Y, int wh.X, int wh.Y)
     let inline ofTup (x, y, w, h) = rect(x, y, w, h)
     let inline toTup (r:rect) = r.X,r.Y,r.Width,r.Height
     let inline map f (r:rect) = seq {for x = r.X to r.Right - 1 do
@@ -103,6 +118,7 @@ module Rect =
     let inline iter f (r:rect) = for x = r.X to r.Right - 1 do
                                     for y = r.Y to r.Bottom - 1 do
                                         f x y
+   
     let inline edges (r:rect) = seq { 
         for x = r.X to r.Right - 1 do
          yield pt(x, r.Y)
@@ -111,6 +127,8 @@ module Rect =
          yield pt(r.X, y)
          yield pt(r.Right-1, y)
     }
+      
+    let inAny r = Seq.exists (intersectsr r)
                   
     let parse s = maybe {
         let! split =  String.split s ' ' 

@@ -10,7 +10,7 @@ let defRoomSpec = {seed = rand(); maxIter = 10000; count = 38; width = (4, 14); 
 let maxGridSize rs = let gs = Seq.map (fun r -> r.gridSize) rs
                      (Seq.map fst gs |> Seq.max, Seq.map snd gs |> Seq.max)
 
-let inAny r rms = Seq.exists (Rect.shift -1 -1 >> Rect.stretch 2 2 >> Rect.intersects1 r) rms
+let inAny r = Rect.inAny (Rect.expand r 1)
 
 let genRooms (r:RoomSpec) = let (w, h) = r.gridSize
                             let limit = rect(1, 1, w-2, h-2)
@@ -49,7 +49,6 @@ let genDungeon rs seed =
                     do Seq.collect Rect.pts rooms
                        |> Seq.append paths
                        |> Seq.iter (fun pt -> grid.[pt.X, pt.Y] <- false)
-                    //Seq.iter (Rect.iter (fun x y -> grid.[x, y] <- false)) rooms
                     Rect.edges gr |> Seq.iter(fun p -> grid.[p.X, p.Y] <- true)
                     grid
 

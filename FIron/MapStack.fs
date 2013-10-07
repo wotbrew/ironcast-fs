@@ -14,6 +14,7 @@ open Geom
 type Stack = {
     light: Grid<bool>
     terr: Grid<sprite>
+    dung: Grid<bool>
     walk: Grid<bool>
     decor: Grid<sprite option> 
     expl: Grid<bool>
@@ -24,6 +25,7 @@ type Stack = {
 let empty = {
     light = Grid.empty
     terr = Grid.empty
+    dung = Grid.empty
     walk = Grid.empty
     decor = Grid.empty
     expl = Grid.empty
@@ -36,6 +38,7 @@ let creCells stack = Grid.someCells stack.cre
 let generate seed theme = 
     let dungeon = Builder.genDungeon [Builder.defRoomSpec] seed
                   |> Grid.ofArray2D
+    let invdungeon = dungeon |> Grid.map not
     let wallsAndFloors = 
         Grid.innerWallsAndFloors dungeon
         |> Seq.map (Tup.mapsnd (konst true))
@@ -43,7 +46,8 @@ let generate seed theme =
         light = dungeon
         terr = Grid.Terr.create seed theme dungeon
         decor = Builder.Decor.walls1 dungeon theme.wallDecor seed
-        walk = dungeon |> Grid.map not
+        walk = invdungeon
+        dung = invdungeon
         expl = Grid.ofCells1 false dungeon.size wallsAndFloors 
         vis = Grid.create dungeon.size false
         cre = Grid.create dungeon.size None
@@ -58,10 +62,15 @@ let withVis v stack = mapVis (konst v) stack
 let mapCre f stack = {
         stack with cre = f stack.cre
     }
+let mapWalk f stack = {
+        stack with walk = f stack.walk
+    }
 
     
-let clearCre p = mapCre (Grid.update1 p None)
-let placeCre cre p = mapCre (Grid.update1 p (Some cre))
+let clearCre p stack = 
+    mapCre (Grid.update1 p None) stack 
+    |> mapWalk (fun x -> if get1 p stack.dung then Grid.update1 p true x else x)
+let placeCre cre p = mapCre (Grid.update1 p (Some cre)) >> mapWalk (Grid.update1 p false)
 let moveCre cre a b stack = 
     if get1 b stack.walk && get1 b stack.cre |> Option.isNone then 
         clearCre a stack |> placeCre cre b |> Some
@@ -71,23 +80,16 @@ let moveCre cre a b stack =
     #endif
     None
 
+/// get the creature at the given point
+let getCre p ms = ms.cre |> Grid.get1 p
 
-let draw sb vp cs stack =
-     let {terr = terr
-          walk = walk
-          decor = decor
-          expl = expl
-          vis = vis
-          cre = cre} = stack
-     let gdraw = {
-        expl = expl
-        vis = vis
-        viewport = vp
-        cellSize = cs
-     }
-     Grid.fastDraw sb gdraw terr
-     Grid.fastDraw1 sb gdraw decor
-     Cre.fastDraw sb gdraw cre
+/// find the creatures in the given rect
+let creIn rect ms =
+    Rect.pts rect
+    |> Seq.map (flip getCre ms)
+    |> Seq.choose id
+     
+
 
 
 let clearVisibility stack = withVis (Grid.create stack.terr.size false) stack

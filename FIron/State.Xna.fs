@@ -40,10 +40,18 @@ module Game =
 
 module Gfx = 
   let mutable manager:GraphicsDeviceManager = null 
+  let mutable blank:Texture2D = null
   let device man = if manager = null then null else manager.GraphicsDevice
 
-  let commuteMan f = dispatch (fun () -> if manager= null |> not then f manager)
+  let commuteMan f = dispatch (fun () -> if manager = null |> not then f manager)
   let commuteDevice f = commuteMan (device >> f)
+  
+  let initBlank() = 
+    commuteDevice (fun gd -> 
+        let t = new Texture2D(gd, 1, 1)
+        t.SetData<Color>([|Color.White|])
+        blank <- t)
+
   let changeResolution (x,y) = 
         commuteMan
          (fun m -> m.PreferredBackBufferWidth <- x
@@ -51,7 +59,8 @@ module Gfx =
   let fullscreen yes = 
         commuteMan (fun m -> m.IsFullScreen <- yes)
   let applyAll() = commuteMan (fun m -> m.ApplyChanges())
-  
+   
+
   module Foreground =
     type Item = 
           | Spr of (Res.sprite * Geom.rect * Color)
