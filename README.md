@@ -1,4 +1,4 @@
 ironcast
 ========
 
-Tactical Dungeon Crawling
+Tactical Dungeon Crawling in F#
