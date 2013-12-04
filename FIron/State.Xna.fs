@@ -1,5 +1,5 @@
 ﻿module State.Xna
-
+open FSharpx
 open Util
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
@@ -8,7 +8,7 @@ type Disp = | Put of (unit -> unit)
             | Get of AsyncReplyChannel<(unit -> unit) list>
 
 let dispatchQueue =
-     Agent.Start(fun box ->
+     MailboxProcessor.Start(fun box ->
         let rec loop lst =  async {
             let! x = box.Receive()
             match x with
@@ -63,41 +63,23 @@ module Gfx =
 
   module Foreground =
     type Item = 
-          | Spr of (Res.sprite * Geom.rect * Color)
-    type FG = 
-        | Put of Item
-        | Puts of Item list
-        | Get of AsyncReplyChannel<Item list>
-        | Clear
-                      
-    let agent = 
-         Agent.Start(fun box ->
-            let rec loop lst =  async {
-                let! x = box.Receive()
-                match x with
-                 | Clear -> return! loop []
-                 | Put x -> return! loop (x :: lst)
-                 | Puts x -> return! loop (x @ lst)
-                 | Get r -> do r.Reply(lst)
-                            return! loop lst
-                return! loop lst
-            }
-            loop [])
-
-    let getForegroundAsync() = agent.PostAndAsyncReply(fun r -> Get r)
-    let getForeground() = agent.PostAndReply(fun r -> Get r)
-
+          | Spr of (Sprite * rect * Color)
+    
+    let agent = Agent(List.empty<Item>)
+    let clear() = send agent (konst [])
+    let put x = send agent (fun lst -> x :: lst)
+    let puts x = send agent (fun lst -> x @ lst)
+    let get() = agent.Value
+                    
     let inline rsprite 
      (sb:SpriteBatch)
-     (t:Res.tex, s:Geom.rect)
-     (r:Geom.rect) 
+     (t:Tex, s:rect)
+     (r:rect) 
      (c:Color) = sb.Draw(t, r, nullable s, c)
 
     let character db rect = Spr ((Map.find "humanMale" db), rect, Color.White)
-    let dcharacter db rect = agent.Post(Put <| character db rect)
+    let dcharacter db rect = character db rect |> put
     
-    let clear() = agent.Post(Clear)
-
     let renderItem sb f = 
         match f with 
         | Spr (s, r, c) -> rsprite sb s r c

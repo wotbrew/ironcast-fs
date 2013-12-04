@@ -24,11 +24,11 @@ type Msg =
      | Resize of (int * int)
      | SetGlobal of string * (string * JSVal) list
      | SetSource of System.Uri
-     | GetTex of AsyncReplyChannel<tex option>
+     | GetTex of AsyncReplyChannel<Tex option>
 
-// awesomium functions should be completely protocted by agent
+// awesomium functions should be completely protocted by actor
 // as not thread safe
-let agent = 
+let actor = 
     let empty = "<html><head><title>Loading...</title></head><body></body></html>"
     let resize (awe:Awe) (w ,h) = awe.Area <- rect(0, 0, w, h)
     let setGlobal (awe:AweCore) name glob = 
@@ -38,7 +38,7 @@ let agent =
         mutObj glob o
 
 
-    Agent.Start(fun box ->
+    Actor.Start(fun box ->
         let init = lazy ((fun () -> init Xna.Game.game (Xna.currentResolution()))
                          |> Xna.dispatchR)
         let rec loop (a:Lazy<Awe>) = async {
@@ -54,7 +54,7 @@ let agent =
         }
         loop init)
 
-let resize sz = agent.Post(Resize sz)
-let tex() = agent.PostAndReply(fun r -> GetTex r)
-let setSource s = agent.Post(SetSource s)
-let setGlobal n o = agent.Post(SetGlobal (n, o))
+let resize sz = actor.Post(Resize sz)
+let tex() = actor.PostAndReply(fun r -> GetTex r)
+let setSource s = actor.Post(SetSource s)
+let setGlobal n o = actor.Post(SetGlobal (n, o))

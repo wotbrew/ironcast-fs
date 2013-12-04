@@ -15,8 +15,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
-    <Tailcalls>true</Tailcalls>
+    <Optimize>false</Optimize>
+    <Tailcalls>false</Tailcalls>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
@@ -46,11 +46,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="FSharpx.Core">
-      <HintPath>..\packages\FSharpx.Core.1.8.37\lib\40\FSharpx.Core.dll</HintPath>
+      <HintPath>..\packages\FSharpx.Core.1.8.41\lib\40\FSharpx.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FSharpx.Observable">
-      <HintPath>..\packages\FSharpx.Observable.1.8.37\lib\40\FSharpx.Observable.dll</HintPath>
+      <HintPath>..\packages\FSharpx.Observable.1.8.41\lib\40\FSharpx.Observable.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FSharpx.TypeProviders.Regex">
@@ -73,33 +73,12 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Util.fs" />
-    <Compile Include="Geom.fs" />
-    <Compile Include="Res.fs" />
-    <Compile Include="Data.fs" />
-    <Compile Include="Rand.fs" />
-    <Compile Include="Grid.fs" />
-    <Compile Include="Cre.fs" />
-    <Compile Include="Builder.fs" />
-    <Compile Include="MapStack.fs" />
-    <Compile Include="MapTables.fs" />
-    <Compile Include="Cam.fs" />
-    <Compile Include="Ui.fs" />
     <Compile Include="Js.Core.fs" />
     <Compile Include="State.Xna.fs" />
     <Compile Include="State.Awe.fs" />
-    <Compile Include="State.Db.fs" />
-    <Compile Include="State.Time.fs" />
-    <Compile Include="State.Cam.fs" />
-    <Compile Include="State.Settings.fs" />
-    <Compile Include="State.Path.fs" />
-    <Compile Include="State.MapState.fs" />
-    <Compile Include="State.Move.fs" />
-    <Compile Include="State.Ui.fs" />
-    <Compile Include="State.Event.fs" />
     <Compile Include="Js.Api.fs" />
-    <Compile Include="Input.fs" />
     <Compile Include="Render.fs" />
+    <Compile Include="Init.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <None Include="packages.config" />
@@ -109,6 +88,41 @@
     <ProjectReference Include="..\..\AwesomiumXNA Zipped\AwesomiumXNA\AwesomiumXNA.csproj">
       <Name>AwesomiumXNA</Name>
       <Project>{251bcedb-cc58-4266-b087-6d404a4a1785}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\FIron.Csp\FIron.Csp.fsproj">
+      <Name>FIron.Csp</Name>
+      <Project>{16daad62-0f65-4bde-8b66-540432a94e42}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\FIron.Gen\FIron.Gen.fsproj">
+      <Name>FIron.Gen</Name>
+      <Project>{d7487b56-f9fd-484e-b44a-9f7d36dac94c}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\FIron.Json\FIron.Json.fsproj">
+      <Name>FIron.Json</Name>
+      <Project>{2b8ddf57-6884-4d30-95da-a0bcf840cb1b}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\FIron.Pure\FIron.Pure.fsproj">
+      <Name>FIron.Pure</Name>
+      <Project>{955f42eb-e338-470f-a5f5-9fbcae7ce791}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\FIron.Res\FIron.Res.fsproj">
+      <Name>FIron.Res</Name>
+      <Project>{a52adaa0-aece-4386-84ab-97bfed5badaa}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\FIron.State\FIron.State.fsproj">
+      <Name>FIron.State</Name>
+      <Project>{54e76106-bb1e-4ed6-a277-0f29a814c73b}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\FIronCS.Data\FIronCS.Data.csproj">
+      <Name>FIronCS.Data</Name>
+      <Project>{26b9182c-b7bf-4a1f-bb1d-c55e11704bb1}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\FIronCS\FIronCS.csproj">

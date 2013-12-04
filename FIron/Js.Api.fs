@@ -6,12 +6,12 @@ open Util
 
 module Options =
  open Settings
- let getSettings = jsfun0 (fun () -> Settings.get() |> jssettings)
- let setSettings = Option.silenceIn Settings.set |> jsproc1 fssettings
+ let getVideo = jsfun0 (fun () -> Settings.agent.Value.video |> jsvideo)
+ let setVideo = Option.silenceIn Settings.setVideo |> jsproc1 fsvideo
  let getResolutions = jsfun0 (fun () -> Db.get().allRes |> jsallRes)
  let all = 
-     ["getSettings", getSettings
-      "setSettings", setSettings
+     ["getVideo", getVideo
+      "setVideo", setVideo
       "getResolutions", getResolutions]
 
 
@@ -25,7 +25,7 @@ module Drawing =
         Option.maybe {
             let! i = oi
             let! p = op
-            return State.MapState.moveCre i p
+            return World.moveCre i p
         } |> ignore)  
  let drawChar = jsproc1
                  fsrect 

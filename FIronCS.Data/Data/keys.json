@@ -1,0 +1,6 @@
+{
+   "cam": ["W", "A", "S", "D", "LeftShift"],
+   "select": "left",
+   "selectManyMod": "LeftShift", 
+   "move": "left"  
+}

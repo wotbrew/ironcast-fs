@@ -1,5 +1,6 @@
 ﻿module Render
 
+open Util
 open Microsoft.Xna.Framework;
 open Microsoft.Xna.Framework.Graphics
 open Geom
@@ -7,6 +8,16 @@ open FSharpx
 open FSharpx.Collections
 open FIronCS
 open Awesomium.Core
+
+let inline drawBlank (sb:SpriteBatch) (dest:rect) color =
+    sb.Draw(State.Xna.Gfx.blank, dest, color)
+let inline drawBox sb (dest:rect) color thickness =
+    let sides = 
+        [rect(dest.X, dest.Y, dest.Width, thickness)
+         rect(dest.Right - thickness, dest.Y, thickness, dest.Height)
+         rect(dest.X, dest.Bottom - thickness, dest.Width, thickness)
+         rect(dest.X, dest.Y, thickness, dest.Height)]
+    for r in sides do drawBlank sb r color
 
 module Grid = 
     open Grid
@@ -40,7 +51,7 @@ module Grid =
         let cs = data.cellSize
         let inline f x y c g =
                 let spr = get x y g
-                Res.Sprite.draw sb spr x y 32 (shadeForVisbility c)
+                Res.Sprite.draw sb spr x y data.cellSize (shadeForVisbility c)
         viewPortIter data f g
 
     /// draw quickly a grid of sprite options
@@ -48,14 +59,20 @@ module Grid =
         let cs = data.cellSize
         let inline f x y c g =
             match get x y g with
-            | Some spr -> Res.Sprite.draw sb spr x y 32 (shadeForVisbility c) 
+            | Some spr -> Res.Sprite.draw sb spr x y data.cellSize (shadeForVisbility c) 
             | None -> ()
         viewPortIter data f g 
 
 
 module Cre = 
-    open Cre
     open Grid
+    open Cre
+    open Res
+
+    let inline draw sb x y cs c cre = 
+        for spr in cre.body
+            do Sprite.draw sb spr x y cs c
+
     let inline fastDraw sb data g =
         let cs = data.cellSize
         let inline f x y v g = 
@@ -64,9 +81,20 @@ module Cre =
             | _ -> ()
         Grid.viewPortIter data f g
     
+module Ui = 
+    open Ui
+    open Res
+    let drawSelection sb sprite cellSize selected = 
+        let selection = sprite
+        for i:pt in selected do
+            Res.Sprite.draw sb selection i.X i.Y cellSize Color.LightGreen
+
+    let drawLasso sb lasso = 
+        if Lasso.isLassoing lasso then
+            drawBox sb lasso.rect Color.Green 2
 
 type DrawData = {  
-    db : Data.Db
+    db : Db.Db
     gd : GraphicsDevice
     sb : SpriteBatch
     sampler : SamplerState
@@ -79,16 +107,16 @@ let draw dd =
             sb = sb
             sampler = sampler
         } = dd
-    let stack = State.MapState.getAsync() |> Async.StartAsTask
-    let cam = State.Cam.getAsync() |> Async.StartAsTask
-    let postGui = State.Xna.Gfx.Foreground.getForegroundAsync() |> Async.StartAsTask
-    let uiState = State.Ui.getAsync() |> Async.StartAsTask
+    let stack = World.getAsync() |> Async.StartAsTask
+    let cam = Cam.get()
+    let postGui = State.Xna.Gfx.Foreground.get()
+    let uiState = Ui.state.Value
 
     gd.SamplerStates.[0] <- sampler
     gd.Clear(Color.Black)
         
-    let matrix = Cam.matrix cam.Result
-    let vp = Cam.viewport cam.Result
+    let matrix = Cam.matrix cam
+    let vp = Cam.viewport cam
 
     let map = stack.Result
 
@@ -100,34 +128,39 @@ let draw dd =
                 null,
                 matrix)
 
-        
+    let settings = Settings.agent.Value
+    let video = settings.video    
+    let cellSize = int video.cellSize
     let gdraw = 
             { 
             expl = map.stack.expl
             vis = map.stack.vis
             viewport = vp
-            cellSize = 32
+            cellSize = cellSize
             } : Grid.DrawData
 
     Grid.fastDraw sb gdraw map.stack.terr
     Grid.fastDraw1 sb gdraw map.stack.decor
 
-    let selected = uiState.Result.selected |> Seq.choose (flip Map.tryFind map.tables.crePos)
+    let selected = 
+        uiState.selected
+        |> Seq.choose (flip Map.tryFind map.tables.crePos)
+
     let selection = db.sprites.["selection"]
-    for i in selected do
-        Res.Sprite.draw sb selection i.X i.Y 32 Color.LightGreen
-            
+
+    Ui.drawSelection sb selection cellSize selected
     Cre.fastDraw sb gdraw map.stack.cre
 
     do sb.End()
        
     sb.Begin()
+    Ui.drawLasso sb uiState.lasso
 
     let aweTex = State.Awe.tex()
     match State.Awe.tex() with
         | Some t -> sb.Draw(t, gd.Viewport.Bounds, Color.White)
         | None -> ()
          
-    for f in postGui.Result do State.Xna.Gfx.Foreground.renderItem sb f 
+    for f in postGui do State.Xna.Gfx.Foreground.renderItem sb f 
 
     sb.End()

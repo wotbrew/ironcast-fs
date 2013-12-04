@@ -52,10 +52,11 @@ Tiles\Spell.png
 Tiles\Stat.png
 Tiles\Status.png
 Tiles\Weapons.png
+Data\keys.json
 Data\races\dwarf.json
 Data\races\human.json
 Data\resolutions.json
-Data\settings.json
+Data\video.json
 Data\themes\castle.json
 Gui\css\cinzel.woff
 Gui\css\font.woff

@@ -198,9 +198,9 @@ and createObj pairs =
     mutObj pairs o
 
 module Settings =
-    open Data.Settings
+    open Settings
     let jsresolution = jspair
-    let jssettings s = 
+    let jsvideo s = 
         let res = jsresolution s.resolution
         let fs = jsbool s.fullscreen
         ["resolution", res
@@ -212,7 +212,7 @@ module Settings =
           |> Option.orElseF (fun () -> fsstr v 
                                        |> Option.bind parseResolution)
 
-    let fssettings s = Option.maybe {
+    let fsvideo s = Option.maybe {
         let! map = fsmap s
         let prop b f = fspick map b f
         let! resolution = prop "resolution" fsresolution
@@ -220,11 +220,12 @@ module Settings =
         return {
             resolution = resolution
             fullscreen = fullscreen
+            cellSize = 32.0f
         }
     }
 
 module Cre = 
-    open Data.Cre
+    open Cre
 
     let jsrace r = 
         let name = r.name |> jsstr
