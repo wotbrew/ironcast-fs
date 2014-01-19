@@ -71,7 +71,7 @@ module Sheet =
                           |> Seq.distinctBy (fun (_, (n,r)) -> n)
                           |> Seq.map (fun (t, (n,r)) -> (n, (t, r)))
 
-            return Map.ofSeq sprites
+            return sheets, Map.ofSeq sprites
         }   
 
 /// module for generating the .png sprite cache

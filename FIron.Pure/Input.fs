@@ -142,13 +142,30 @@ let keyboardInput st =
 type MapMouse = {
     mapPos : pt
     cre : Cre.Creature option
+    obj : Obj.Obj option
 }
 
 let mapMouse gs input =
     let loc = mouseMapPt gs input
-    if World.inBounds loc gs.world then
+    if World.inBounds gs.world loc then
         {
            mapPos = loc
-           cre = Gs.getCre loc gs
+           cre = Gs.getCre gs loc
+           obj = Gs.getObj gs loc
         } |> Some
     else None
+
+let actionsAt mouse = mouse.obj |> Option.map Interact.objActions <??> []
+
+let numKeys = [
+    Keys.D1;
+    Keys.D2;
+    Keys.D3;
+    Keys.D4;
+    Keys.D5;
+    Keys.D6;
+    Keys.D7;
+    Keys.D8;
+    Keys.D9;
+    Keys.D0
+]

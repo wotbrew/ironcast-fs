@@ -3,7 +3,9 @@
 open Microsoft.Xna.Framework
 open FSharpx
 open Util
+open FIronCS
 
+type IDict<'a, 'b> = System.Collections.Generic.IDictionary<'a, 'b>
 
 type Rectangle with
     member r.BottomRight = pt(r.X + r.Width, r.Y + r.Height)
@@ -17,30 +19,18 @@ type Direction = | N
                  | W
                  | NW
 
-module Dir = 
-    /// Transform a direction to a unit point
-    let inline pt d =
-        match d with
-            | N -> pt(0, -1)
-            | NE -> pt(1, -1)
-            | E -> pt(1, 0)
-            | SE -> pt(1, 1)
-            | S -> pt(0, 1)
-            | SW -> pt(-1, 1)
-            | W -> pt(-1, 0)
-            | NW -> pt(-1, -1)
-    /// Transform a direction to a unit vector
-    let inline vec d = let p = pt d
-                       in vec(float32 p.X, float32 p.Y)
-    /// A set of all the directions
-    let all = [N; NE; E; SE; S; SW; W; NW] |> set
-    /// A set if all cardinal directions
-    let cardinal = [N; E; S; W;] |> set
-    let cardinalp = Seq.map pt all |> Array.ofSeq
-    let allp = Seq.map pt all |> Array.ofSeq
-    /// A set of all diagonal directions
-    let diag = Set.difference all cardinal
-    let diagp = Seq.map pt diag |> Array.ofSeq
+module Vec = 
+    let def = Unchecked.defaultof<vec>
+    let inline x (v:vec) = v.X
+    let inline y (v:vec) = v.Y
+    let inline ofPt (p:pt) = vec(float32 p.X, float32 p.Y)
+    let inline ofInts x y = vec(float32 x, float32 y)
+    let inline of2 x y = vec(x, y)
+    let inline toPair v = x v, y v
+    let inline reflect n v = vec.Reflect(n, v)
+    let inline norm v = vec.Normalize v
+    let inline round (v:vec) = vec(round v.X, round v.Y)
+    let inline negate v = vec.Negate v
 
 module Pt =
     let def = Unchecked.defaultof<pt>
@@ -67,21 +57,19 @@ module Pt =
     let inline div2 n a = div1 n n a
     let inline divf x y (a:pt) = pt(float32 a.X / x |> int, float32 a.Y / y |> int)
     let inline divf2 n a = divf n n a
-    let inline adj a = Seq.map (add a) Dir.allp
-    let inline adjc a = Seq.map (add a) Dir.cardinalp
     let inline maxX pts = Seq.maxBy x pts |> x
     let inline maxY pts = Seq.maxBy y pts |> y
     let inline max (pts:pt seq) = pt(maxX pts, maxY pts)
     let inline toPair p = x p, y p
     let inline toRect p w h = rect(x p, y p, w, h)
-module Vec = 
-    let def = Unchecked.defaultof<vec>
-    let inline x (v:vec) = v.X
-    let inline y (v:vec) = v.Y
-    let inline ofPt (p:pt) = vec(float32 p.X, float32 p.Y)
-    let inline ofInts x y = vec(float32 x, float32 y)
-    let inline of2 x y = vec(x, y)
-    let inline toPair v = x v, y v
+    let inline normv p = Vec.ofPt p |> Vec.norm
+    let inline norm p = normv p |> Vec.round |> ofVec
+    let inline direction a b = sub b a |> norm
+    let inline negate p = Vec.ofPt p |> Vec.negate |> ofVec
+    let inline opposite pivot p = sub pivot p
+    
+    let inline flood f (p:pt) = p.Flood (fun x -> f x)
+
 module Rect =
     open FSharpx.Option
     let def = Unchecked.defaultof<rect>
@@ -89,6 +77,9 @@ module Rect =
     let inline y (r:rect) = r.Y
     let inline w (r:rect) = r.Width
     let inline h (r:rect) = r.Height
+    
+    let inline div2 n (r:rect) = rect(r.X/n, r.Y/n, r.Width/n, r.Height/n)
+
     let inline size r = w r, h r
     let inline sizev r = Vec.ofInts (w r) (h r)
     let inline loc (r:rect) = r.Location
@@ -112,7 +103,8 @@ module Rect =
     let inline map f (r:rect) = seq {for x = r.X to r.Right - 1 do
                                        for y = r.Y to r.Bottom - 1 do
                                          yield f x y} 
-    let inline pts r = map Pt.of2 r 
+    let inline pts r = map Pt.of2 r
+    let inline mapPts f = pts >> Seq.map f
     let inline iter f (r:rect) = for x = r.X to r.Right - 1 do
                                     for y = r.Y to r.Bottom - 1 do
                                         f x y
@@ -121,7 +113,7 @@ module Rect =
         for x = r.X to r.Right - 1 do
          yield pt(x, r.Y)
          yield pt(x, r.Bottom-1)
-        for y = r.Y to r.Height - 1 do
+        for y = r.Y to r.Bottom - 1 do
          yield pt(r.X, y)
          yield pt(r.Right-1, y)
     }
@@ -137,5 +129,44 @@ module Rect =
     }
 
 
+
+module Dir = 
+    /// Transform a direction to a unit point
+    let inline pt d =
+        match d with
+            | N -> pt(0, -1)
+            | NE -> pt(1, -1)
+            | E -> pt(1, 0)
+            | SE -> pt(1, 1)
+            | S -> pt(0, 1)
+            | SW -> pt(-1, 1)
+            | W -> pt(-1, 0)
+            | NW -> pt(-1, -1)
+    /// Transform a direction to a unit vector
+    let inline vec d = let p = pt d
+                       in vec(float32 p.X, float32 p.Y)
+    /// A set of all the directions
+    let all = [N; NE; E; SE; S; SW; W; NW] |> set
+    /// A set if all cardinal directions
+    let cardinal = [N; E; S; W;] |> set
+    let cardinalp = Seq.map pt cardinal |> Array.ofSeq
+    let allp = Seq.map pt all |> Array.ofSeq
+    /// A set of all diagonal directions
+    let diag = Set.difference all cardinal
+    let diagp = Seq.map pt diag |> Array.ofSeq
+    
+    type Maps = {
+        pts : IDict<pt, Direction>
+        vecs : IDict<vec, Direction>
+    }
+    let maps = {
+        pts = all |> Seq.map (fun d -> vec d |> Pt.ofVec, d) |> dict
+        vecs = all |> Seq.map (fun d -> vec d, d) |> dict
+    }
+    let ptMap = maps.pts
+    let vecMap = maps.vecs
+
+    let inline adj a = Seq.map (Pt.add a) allp
+    let inline adjc a = Seq.map (Pt.add a) cardinalp
 
    

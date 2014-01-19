@@ -41,7 +41,10 @@
     <Compile Include="Geom.fs" />
     <Compile Include="Settings.fs" />
     <Compile Include="Grid.fs" />
+    <Compile Include="Tile.fs" />
     <Compile Include="Cre.fs" />
+    <Compile Include="Obj.fs" />
+    <Compile Include="Interact.fs" />
     <Compile Include="MapStack.fs" />
     <Compile Include="MapTables.fs" />
     <Compile Include="Cam.fs" />
@@ -50,6 +53,7 @@
     <Compile Include="Ui.fs" />
     <Compile Include="Gs.fs" />
     <Compile Include="Input.fs" />
+    <None Include="Repl.fsx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharpx.Core">

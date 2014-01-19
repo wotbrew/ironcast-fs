@@ -1,0 +1,170 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'C:\\Program Files\\nodejs\\\\node.exe',
+1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'install',
+1 verbose cli   '-g',
+1 verbose cli   'grunt-cli' ]
+2 info using npm@1.2.32
+3 info using node@v0.10.12
+4 verbose node symlink C:\Program Files\nodejs\\node.exe
+5 verbose read json C:\Users\Dan\AppData\Roaming\npm\package.json
+6 verbose read json C:\Users\Dan\AppData\Roaming\npm\package.json
+7 verbose cache add [ 'grunt-cli', null ]
+8 verbose cache add name=undefined spec="grunt-cli" args=["grunt-cli",null]
+9 verbose parsed url { protocol: null,
+9 verbose parsed url   slashes: null,
+9 verbose parsed url   auth: null,
+9 verbose parsed url   host: null,
+9 verbose parsed url   port: null,
+9 verbose parsed url   hostname: null,
+9 verbose parsed url   hash: null,
+9 verbose parsed url   search: null,
+9 verbose parsed url   query: null,
+9 verbose parsed url   pathname: 'grunt-cli',
+9 verbose parsed url   path: 'grunt-cli',
+9 verbose parsed url   href: 'grunt-cli' }
+10 silly lockFile 671ef8ac-grunt-cli grunt-cli
+11 verbose lock grunt-cli C:\Users\Dan\AppData\Roaming\npm-cache\671ef8ac-grunt-cli.lock
+12 silly lockFile 671ef8ac-grunt-cli grunt-cli
+13 silly lockFile 671ef8ac-grunt-cli grunt-cli
+14 verbose addNamed [ 'grunt-cli', '' ]
+15 verbose addNamed [ null, '' ]
+16 silly lockFile d63f3d0b-grunt-cli grunt-cli@
+17 verbose lock grunt-cli@ C:\Users\Dan\AppData\Roaming\npm-cache\d63f3d0b-grunt-cli.lock
+18 silly addNameRange { name: 'grunt-cli', range: '', hasData: false }
+19 verbose url raw grunt-cli
+20 verbose url resolving [ 'https://registry.npmjs.org/', './grunt-cli' ]
+21 verbose url resolved https://registry.npmjs.org/grunt-cli
+22 info trying registry request attempt 1 at 20:10:02
+23 http GET https://registry.npmjs.org/grunt-cli
+24 http 503 https://registry.npmjs.org/grunt-cli
+25 verbose bad json <?xml version="1.0" encoding="utf-8"?>
+25 verbose bad json <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+25 verbose bad json  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+25 verbose bad json <html>
+25 verbose bad json   <head>
+25 verbose bad json     <title>503 backend read error</title>
+25 verbose bad json   </head>
+25 verbose bad json   <body>
+25 verbose bad json     <h1>Error 503 backend read error</h1>
+25 verbose bad json     <p>backend read error</p>
+25 verbose bad json     <h3>Guru Meditation:</h3>
+25 verbose bad json     <p>XID: 1547393232</p>
+25 verbose bad json     <hr>
+25 verbose bad json     <p>Varnish cache server</p>
+25 verbose bad json   </body>
+25 verbose bad json </html>
+26 error registry error parsing json
+27 info retry will retry, error on last attempt: SyntaxError: Unexpected token <
+27 info retry
+27 info retry <?xml version="1.0" encoding="utf-8"?>
+27 info retry <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+27 info retry  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+27 info retry <html>
+27 info retry   <head>
+27 info retry     <title>503 backend read error</title>
+27 info retry   </head>
+27 info retry   <body>
+27 info retry     <h1>Error 503 backend read error</h1>
+27 info retry     <p>backend read error</p>
+27 info retry     <h3>Guru Meditation:</h3>
+27 info retry     <p>XID: 1547393232</p>
+27 info retry     <hr>
+27 info retry     <p>Varnish cache server</p>
+27 info retry   </body>
+27 info retry </html>
+28 info trying registry request attempt 2 at 20:10:28
+29 http GET https://registry.npmjs.org/grunt-cli
+30 http 503 https://registry.npmjs.org/grunt-cli
+31 verbose bad json <?xml version="1.0" encoding="utf-8"?>
+31 verbose bad json <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+31 verbose bad json  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+31 verbose bad json <html>
+31 verbose bad json   <head>
+31 verbose bad json     <title>503 Connection timed out</title>
+31 verbose bad json   </head>
+31 verbose bad json   <body>
+31 verbose bad json     <h1>Error 503 Connection timed out</h1>
+31 verbose bad json     <p>Connection timed out</p>
+31 verbose bad json     <h3>Guru Meditation:</h3>
+31 verbose bad json     <p>XID: 1068350496</p>
+31 verbose bad json     <hr>
+31 verbose bad json     <p>Varnish cache server</p>
+31 verbose bad json   </body>
+31 verbose bad json </html>
+32 error registry error parsing json
+33 info retry will retry, error on last attempt: SyntaxError: Unexpected token <
+33 info retry
+33 info retry <?xml version="1.0" encoding="utf-8"?>
+33 info retry <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+33 info retry  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+33 info retry <html>
+33 info retry   <head>
+33 info retry     <title>503 Connection timed out</title>
+33 info retry   </head>
+33 info retry   <body>
+33 info retry     <h1>Error 503 Connection timed out</h1>
+33 info retry     <p>Connection timed out</p>
+33 info retry     <h3>Guru Meditation:</h3>
+33 info retry     <p>XID: 1068350496</p>
+33 info retry     <hr>
+33 info retry     <p>Varnish cache server</p>
+33 info retry   </body>
+33 info retry </html>
+34 info trying registry request attempt 3 at 20:11:29
+35 http GET https://registry.npmjs.org/grunt-cli
+36 http 500 https://registry.npmjs.org/grunt-cli
+37 verbose bad json Internal routing error
+37 verbose bad json
+37 verbose bad json Sorry, we cannot connect to the intended server.
+37 verbose bad json
+37 verbose bad json We have just been notified of this problem. We will correct it as soon as possible.
+37 verbose bad json
+37 verbose bad json Feel free to contact us if you have any questions: support@iriscouch.com
+38 error registry error parsing json
+39 silly registry.get cb [ 500,
+39 silly registry.get   { date: 'Tue, 14 Jan 2014 20:11:36 GMT',
+39 silly registry.get     server: 'Apache',
+39 silly registry.get     'content-type': 'text/plain',
+39 silly registry.get     'cache-control': 'max-age=0',
+39 silly registry.get     'content-length': '239',
+39 silly registry.get     'accept-ranges': 'bytes',
+39 silly registry.get     via: '1.1 varnish',
+39 silly registry.get     age: '0',
+39 silly registry.get     'x-served-by': 'cache-lcy1125-LCY',
+39 silly registry.get     'x-cache': 'MISS',
+39 silly registry.get     'x-cache-hits': '0',
+39 silly registry.get     'x-timer': 'S1389730295.452709675,VS0,VE597',
+39 silly registry.get     connection: 'close' } ]
+40 silly lockFile d63f3d0b-grunt-cli grunt-cli@
+41 silly lockFile d63f3d0b-grunt-cli grunt-cli@
+42 error SyntaxError: Unexpected token I
+42 error Internal routing error
+42 error
+42 error Sorry, we cannot connect to the intended server.
+42 error
+42 error We have just been notified of this problem. We will correct it as soon as possible.
+42 error
+42 error Feel free to contact us if you have any questions: support@iriscouch.com
+42 error
+42 error     at Object.parse (native)
+42 error     at RegClient.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\npm-registry-client\lib\request.js:238:23)
+42 error     at Request.self.callback (C:\Program Files\nodejs\node_modules\npm\node_modules\request\index.js:148:22)
+42 error     at Request.EventEmitter.emit (events.js:98:17)
+42 error     at Request.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\request\index.js:876:14)
+42 error     at Request.EventEmitter.emit (events.js:117:20)
+42 error     at IncomingMessage.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\request\index.js:827:12)
+42 error     at IncomingMessage.EventEmitter.emit (events.js:117:20)
+42 error     at _stream_readable.js:910:16
+42 error     at process._tickCallback (node.js:415:13)
+43 error If you need help, you may report this log at:
+43 error     <http://github.com/isaacs/npm/issues>
+43 error or email it to:
+43 error     <npm-@googlegroups.com>
+44 error System Windows_NT 6.1.7601
+45 error command "C:\\Program Files\\nodejs\\\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "install" "-g" "grunt-cli"
+46 error cwd C:\Users\Dan\My Documents\Visual Studio 2012\Projects\FIron\FIronCS.Data\Ui\src
+47 error node -v v0.10.12
+48 error npm -v 1.2.32
+49 error type unexpected_token
+50 verbose exit [ 1, true ]

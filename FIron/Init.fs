@@ -8,7 +8,7 @@ open Awesomium.Core
 
 module Pages = 
     let urify s = (IO.currentDirectory + s).ToUri()
-    let main = urify @"/Gui/main.html"
+    let main = urify @"/Ui/main.html"
     let newGame = urify @"/Gui/newgame.html"
 
 let tileDir = (IO.combinePaths IO.currentDirectory "Tiles")
@@ -27,19 +27,24 @@ let loadDb gd : Db.Db option = Option.maybe {
     let! allRes = Settings.loadResolutions File.allRes
     do printfn "%s" "Done"
     do printfn "%s" "Loading resources"
-    let! sprites = Res.Sheet.spriteStore Dir.tileDir gd |> Choice.toOption
+    let! sheets, sprites = Res.Sheet.spriteStore Dir.tileDir gd |> Choice.toOption
     do printfn "%s" "Done"
     do printfn "%s" "Loading races"
     let! races = Cre.loadRacesMap sprites
     do printfn "%s" "Done"
-    do printfn "%s" "Loading themes"
-    let! themes = World.loadThemeMap sprites
+    //do printfn "%s" "Loading themes"
+   // let! themes = World.loadThemeMap sprites
+    //do printfn "%s" "Done"
+    do printfn "%s" "Loading objects"
+    let! objects = Obj.loadObjectMap sprites
     do printfn "%s" "Done"
     return {
         allRes = allRes
+        sheets = sheets
         sprites = sprites
         races = races
-        themes = themes
+        //themes = themes
+        objects = objects
     }
 }
 
@@ -52,7 +57,7 @@ let initDb gd =
 
 let initCam screen cellSize = 
     do printfn "%s" "Initializing camera"
-    let mapSize = Builder.defRoomSpec.gridSize
+    let mapSize = Spec.defaultLevelSpec.size
     Cam.swap (Cam.resize screen mapSize cellSize)
     do printfn "%s" "Done"
 
@@ -77,17 +82,20 @@ let placeTestCreatures (db:Db.Db) (map:MapStack.Stack) =
     let vis6 = Seq.take 6 visible |> List.ofSeq
     let creature i = {id = i; isPlayer = true; body = db.races.["Human"].spriteM |> snd |> List.singleton} : Cre.Creature
     Seq.fold
-            (fun map (pt, i) -> MapStack.placeCre (creature i) pt map)
+            (fun map (pt, i) -> MapStack.placeCre (creature i) map pt)
             map
             (Seq.zip vis6 [0 .. 5])
 
 let initWorld (db:Db.Db) = 
     do printfn "%s" "Initializing world"
-    let castle = db.themes.["castle"]
-    let map = MapStack.generate seed castle
-             |> placeTestCreatures db 
-    World.init map
-    Path.newWalk map.walk
+    
+    let map = Maps.readMap "Maps\\testmap.json"
+    let initData = Maps.mapInitData db.sprites.["castleWall1"] db map
+    let terrain = Maps.tileGrid map
+    let ms = MapStack.ofTileMap initData |> placeTestCreatures db
+
+    World.init ms
+    Path.newWalk ms.walk
     World.refreshVis()
     do printfn "%s" "Done"
     

@@ -38,8 +38,11 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Compile Include="Rand.fs" />
-    <Compile Include="Builder.fs" />
+    <Compile Include="Spec.fs" />
+    <Compile Include="Walks.fs" />
     <Compile Include="Grid.fs" />
+    <Compile Include="Decor.fs" />
+    <Compile Include="Doors.fs" />
     <Compile Include="MapStack.fs" />
   </ItemGroup>
   <ItemGroup>

@@ -75,8 +75,8 @@ let empty = {
         }  
 
 /// transform a rect into world co-ordinates (by cells)
-let mapRect cam cs rect =
+let mapRect cam (cs:float32) rect =
     let world = world (Rect.locv rect) cam
-    let loc = world / float32 cs
-    let bounds = Rect.sizev rect / float32 cs
+    let loc = world / cs
+    let bounds = Rect.sizev rect / cs
     Rect.ofVecs loc bounds

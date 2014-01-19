@@ -6,6 +6,13 @@ Content\Small.xnb
 Content\Tiny.xnb
 Content\Arial10.xnb
 Content\Music\Five Armies.wma
+Data\objects\door.json
+Ui\css\iron.css
+Ui\js\require.js
+Ui\src\config.js
+Ui\src\debug.js
+Ui\src\interact.js
+Ui\src\templates.js
 Gui\css\iron-theme\images\animated-overlay.gif
 Gui\css\iron-theme\images\ui-bg_diamond_23_000000_10x8.png
 Gui\css\iron-theme\images\ui-bg_flat_0_aaaaaa_40x100.png
@@ -52,6 +59,18 @@ Tiles\Spell.png
 Tiles\Stat.png
 Tiles\Status.png
 Tiles\Weapons.png
+Ui\css\bootstrap.css
+Ui\css\bootstrap.min.css
+Ui\img\glyphicons-halflings-white.png
+Ui\img\glyphicons-halflings.png
+Ui\js\bootstrap.js
+Ui\js\bootstrap.min.js
+Ui\js\handlebars-1.0.0.js
+Ui\js\jquery-2.0.3.min.js
+Ui\js\underscore.js
+Ui\main.html
+Ui\css\cinzel.woff
+Ui\css\font.woff
 Data\keys.json
 Data\races\dwarf.json
 Data\races\human.json
@@ -60,6 +79,7 @@ Data\themes\castle.json
 Data\video.json
 Gui\css\cinzel.woff
 Gui\css\font.woff
+Maps\testmap.json
 Tiles\Armour.spr
 Tiles\CastleDungeon.spr
 Tiles\Decorations1.spr

@@ -32,23 +32,51 @@ let select (game:Gs.Gs) cre st =
 let moveParty (mouse:MapMouse) (game:Gs.Gs) st = 
     let pos = mouse.mapPos
     let button = game.settings.keys.move
-    if mouseClick button st && World.canWalk pos game.world then
-       Move.creatures pos game.ui.selected
+    if mouseClick button st && World.canWalk game.world pos then
+       do Move.creatures pos game.ui.selected
+       None
+    else Some ()
+
+
 
 let updateLasso (game:Gs.Gs) st = 
+    let maprect = Cam.mapRect game.cam game.settings.video.cellSize
     let button = game.settings.keys.select
-    if mousePressed button st then 
-       Ui.state.Swap (Ui.mapLasso (Ui.Lasso.updateFromMouse (mousePt st)))
+    let pressed = mousePressed button st
+    let lasso = game.ui.lasso
+    if pressed then
+        let ui = Ui.updateFromMouse (mousePt st) game.ui
+        Ui.state.Swap <| Ui.updateFromMouse (mousePt st)
+        Some ()
+    elif Ui.Lasso.isLassoing lasso then
+        let rect = Gs.worldRect game lasso.rect
+        let select = Gs.lassoedCreatures game |> Seq.map Cre.cid |> Set.ofSeq
+        Ui.state.Swap <| 
+            (Ui.selectOnlyMany select >> Ui.resetLasso)
+        None
     else
-       Ui.state.Swap (Ui.mapLasso (konst Ui.Lasso.empty))
+        Ui.state.Swap Ui.resetLasso
+        Some ()
+
+let processUiTriggers (game:Gs.Gs) mapMouse = 
+        let actions = actionsAt mapMouse
+        Ui.state.Swap (Ui.updateActions actions mapMouse.mapPos)
+        
+let processActions (ui:Ui.Ui) input mapMouse = 
+    let zipped = Seq.zip Input.numKeys ui.actions 
+    for key, action in zipped do
+        if Input.isKeyPressed key input then
+            World.performAction action mapMouse.mapPos
 
 let processInput (game:Gs.Gs) input = 
     let keys = game.settings.keys
     moveCam keys.cam input
     Option.maybe {
         let! mapMouse = mapMouse game input
-        do updateLasso game input
-        do moveParty mapMouse game input
+        do processUiTriggers game mapMouse
+        do processActions game.ui input mapMouse
+        do! updateLasso game input
+        do! moveParty mapMouse game input
         let! cre = mapMouse.cre
         do select game cre input
         return ()

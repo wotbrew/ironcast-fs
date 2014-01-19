@@ -112,6 +112,7 @@ let fstupx4 f =
        | _ -> None
 
 let fspt a = fspair fsint fsint a |> Option.map Geom.Pt.ofPair
+let fsvec = fspt >> Option.map Geom.Vec.ofPt
 let fsrect a = 
       fstupx4 fsint a 
       |> Option.map Geom.Rect.ofTup

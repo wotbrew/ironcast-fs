@@ -19,7 +19,7 @@ let mapTables f state = {
 
 module Core = 
     let moveCre id p state = 
-        if Grid.inBounds1 p state.stack.cre then
+        if Grid.inBounds1 state.stack.cre p then
             Option.maybe {
                 let! pos = Map.tryFind id state.tables.crePos
                 let! cre = Map.tryFind id state.tables.cre
@@ -32,6 +32,15 @@ module Core =
                 }   
             }
         else None
+    let withNewWalk f state = 
+        let world = f state
+        Path.newWalk(world.stack.walk)
+        world
+    let performAt pt state = function 
+            | "Open" -> withNewWalk (World.mapStackAt pt MapStack.openDoorAt) state
+            | "Close" -> withNewWalk (World.mapStackAt pt MapStack.closeDoorAt) state
+            | _ -> state
+
 
 
 type RefreshEvent = 
@@ -51,7 +60,7 @@ type Msg =
      | Init of MapStack.Stack
      | Refresh of RefreshEvent
      | MoveCre of int * pt * AsyncReplyChannel<bool>
-
+     | PerformAction of string * pt
 
 
 let actor = Actor.Start(fun box ->
@@ -67,6 +76,9 @@ let actor = Actor.Start(fun box ->
             let nso = Core.moveCre i p st |> Option.map snd
             r.Reply(Option.isSome nso)
             return! loop (nso <??> st)
+         | PerformAction (a, p) ->
+            let nso = Core.performAt p st a
+            return! loop nso
     }
     loop initial)
 
@@ -76,3 +88,4 @@ let init st = actor.Post(Init st)
 let refreshVis() = actor.Post(Refresh Vis)
 let moveCreAsync i p = actor.PostAndAsyncReply(fun r -> MoveCre (i, p, r))
 let moveCre i p = actor.PostAndReply(fun r -> MoveCre (i, p, r))
+let performAction a p = actor.Post (PerformAction (a, p))

@@ -13,4 +13,3 @@ let select id =
 let selectOnly id = 
     state.Swap (Ui.selectOnly id)
 
-

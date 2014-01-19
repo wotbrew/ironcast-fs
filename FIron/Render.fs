@@ -22,6 +22,10 @@ let inline drawBox sb (dest:rect) color thickness =
 module Grid = 
     open Grid
 
+    let inline shadeForVisbility visible = 
+        if visible then Color.White
+        else Color.Gray
+
     //data required to draw a grid
     type DrawData = {
         viewport:rect
@@ -43,14 +47,14 @@ module Grid =
         let bottom = min (mh-1) (sy + h)
         for x = sx to right do
             for y = sy to bottom do
-                let isVisible = get x y data.vis 
-                if get x y dm then f x y isVisible g
+                let isVisible = get data.vis x y 
+                if get dm x y then f x y isVisible g
 
     /// draw quickly a grid of sprites
     let fastDraw sb data g =
         let cs = data.cellSize
         let inline f x y c g =
-                let spr = get x y g
+                let spr = get g x y
                 Res.Sprite.draw sb spr x y data.cellSize (shadeForVisbility c)
         viewPortIter data f g
 
@@ -58,12 +62,24 @@ module Grid =
     let fastDraw1 sb data g =
         let cs = data.cellSize
         let inline f x y c g =
-            match get x y g with
+            match get g x y with
             | Some spr -> Res.Sprite.draw sb spr x y data.cellSize (shadeForVisbility c) 
             | None -> ()
         viewPortIter data f g 
 
-
+module Obj = 
+    open Grid
+    open Obj
+    open Res
+    let inline draw sb x y cs c door = 
+        Sprite.draw sb (Obj.doorSprite door) x y cs c
+    let inline fastDraw sb data g = 
+        let cs = data.cellSize
+        let inline f x y v g = 
+            match Grid.get g x y, v with 
+             | Some (ObjDoor door), c -> draw sb x y cs (shadeForVisbility c) door
+             | _ -> ()
+        Grid.viewPortIter data f g
 module Cre = 
     open Grid
     open Cre
@@ -76,7 +92,7 @@ module Cre =
     let inline fastDraw sb data g =
         let cs = data.cellSize
         let inline f x y v g = 
-            match Grid.get x y g, v with
+            match Grid.get g x y, v with
             | Some cre, true -> draw sb x y cs Color.White cre
             | _ -> ()
         Grid.viewPortIter data f g
@@ -149,6 +165,7 @@ let draw dd =
     let selection = db.sprites.["selection"]
 
     Ui.drawSelection sb selection cellSize selected
+    Obj.fastDraw sb gdraw map.stack.obj
     Cre.fastDraw sb gdraw map.stack.cre
 
     do sb.End()

@@ -14,7 +14,7 @@ type vec = Vector2
 type rect = Rectangle
 type Tex = Texture2D
 type Sprite = Tex * rect
-type Sheet = string * (string * rect list)
+type Sheet = string * ((string * rect) list)
 
 let blockingQueue<'a> = 
     let queue = new System.Collections.Concurrent.ConcurrentQueue<'a>()
@@ -90,6 +90,7 @@ module Tup3 =
     let inline mapthird f (a,b,c) = a, b, f c
     let inline map fa fb fc (a,b,c) = fa a, fb b, fc c
 module Seq = 
+    let atLeast n f xs = (Seq.sumBy (fun x -> if f x then 1 else 0) xs > n)   
     let notEmpty s = not <| Seq.isEmpty s
     let whenAny xs = Option.ofBoolAndValue (notEmpty xs, xs)
     let product a b = Seq.collect (fun x -> Seq.map (tuple2 x) b) a
@@ -105,6 +106,7 @@ module List =
             if List.length xs = n then Some xs
             else None
     let inline notEmpty xs = not <| List.isEmpty xs
+    let inline cons x xs = x :: xs
                         
 module Option =
     open FSharpx.Option

@@ -43,6 +43,8 @@
     <Compile Include="Settings.fs" />
     <Compile Include="Cre.fs" />
     <Compile Include="World.fs" />
+    <Compile Include="Obj.fs" />
+    <Compile Include="Maps.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Data">

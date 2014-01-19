@@ -11,3 +11,4 @@ let dir d = IO.combinePaths path d |> IO.directoryInfo
 let tileDir = rdir "Tiles"
 let raceDir = dir "races"
 let themeDir = dir "themes"
+let objDir = dir "objects"

@@ -5,7 +5,6 @@ open Microsoft.Xna.Framework;
 open Microsoft.Xna.Framework.Input;
 open Microsoft.Xna.Framework.Graphics
 open Geom
-open Builder
 open FSharpx
 open FSharpx.Collections
 open FIronCS
@@ -23,6 +22,7 @@ let cacheDir = (IO.combinePaths IO.currentDirectory "Gui\\img\\sprites\\")
 
 type MyGame() as x = 
     inherit Game()
+
 
     do State.Xna.Game.game <- x
 
@@ -65,6 +65,10 @@ type MyGame() as x =
     override x.Update(gt) = 
         Gs.update()
         let game = Gs.get()
+        if game.ui.jscalls.Length > 0 then
+            State.Awe.actor.Post (State.Awe.Call game.ui.jscalls)
+            Ui.state.Swap (Ui.mapCalls (konst []))
+
         time := Time.updateTime gt !time
         let delta = time.Value.delta    
         let update = Event.pushAsync delta |> Async.StartAsTask
@@ -72,7 +76,7 @@ type MyGame() as x =
         let gd = gdm.GraphicsDevice
         //Input.fireinput (gd.Viewport.Width, gd.Viewport.Height)
         Input.update game (Mouse.GetState()) (Keyboard.GetState())
-
+        
         let dispatch = State.Xna.dispatchQueue.PostAndReply(fun r -> State.Xna.Get r)
         for d in dispatch do d()
 

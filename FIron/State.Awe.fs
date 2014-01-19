@@ -25,6 +25,7 @@ type Msg =
      | SetGlobal of string * (string * JSVal) list
      | SetSource of System.Uri
      | GetTex of AsyncReplyChannel<Tex option>
+     | Call of Ui.Js.Call list
 
 // awesomium functions should be completely protocted by actor
 // as not thread safe
@@ -50,6 +51,9 @@ let actor =
              | SetGlobal (n, o) -> (fun () -> setGlobal wv n o |> ignore) |> Xna.dispatch
              | SetSource s -> (fun () -> wv.Source <- s) |> Xna.dispatch
              | GetTex r -> r.Reply(Option.ofNil awe.WebViewTexture) //should be safish?!
+             | Call calls -> 
+                //printf "%O" calls
+                Xna.dispatch (fun () -> Seq.iter (awe.WebView.ExecuteJavascript) calls)
             return! loop a
         }
         loop init)

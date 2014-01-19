@@ -15,5 +15,9 @@
         "skeletonDecor",
         "wallFlag",
         "torchBracket"
-    ]
+    ],
+    "door": { 
+        "open": "doorOpen",
+        "closed": "doorClosed"    
+    } 
 }

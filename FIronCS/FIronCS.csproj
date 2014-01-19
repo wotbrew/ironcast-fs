@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Geom.cs" />
+    <Compile Include="IntervalTree.cs" />
     <Compile Include="IPathFinder.cs" />
     <Compile Include="PathFinder.cs" />
     <Compile Include="PathFinderFast.cs" />

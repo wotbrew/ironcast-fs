@@ -82,7 +82,6 @@
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="Repl.fsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\AwesomiumXNA Zipped\AwesomiumXNA\AwesomiumXNA.csproj">
